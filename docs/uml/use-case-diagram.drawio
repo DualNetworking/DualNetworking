@@ -1,0 +1,145 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- Titel -->
+    <mxCell id="2" value="DualNet – Use-Case-Diagramm" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="200" y="20" width="760" height="40" as="geometry" />
+    </mxCell>
+
+    <!-- Systemgrenze -->
+    <mxCell id="3" value="&lt;b&gt;DualNet System&lt;/b&gt;" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mLine;strokeColor=#1a1a2e;fillColor=none;verticalAlign=top;align=center;spacingTop=5;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="200" y="80" width="760" height="700" as="geometry" />
+    </mxCell>
+
+    <!-- ===== AKTEURE ===== -->
+
+    <!-- Akteur: Besucher -->
+    <mxCell id="10" value="Besucher" style="shape=umlActor;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="40" y="200" width="60" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- Akteur: Nutzer (eingeloggt) -->
+    <mxCell id="11" value="Nutzer&#xa;(eingeloggt)" style="shape=umlActor;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="40" y="480" width="60" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- Besucher generalisiert zu Nutzer -->
+    <mxCell id="12" value="" style="endArrow=block;endFill=0;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="10" target="11">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ===== USE CASES ===== -->
+
+    <!-- UC: Registrieren -->
+    <mxCell id="20" value="Registrieren" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="260" y="140" width="160" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- UC: Einloggen -->
+    <mxCell id="21" value="Einloggen" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="260" y="260" width="160" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- UC: Feed anzeigen -->
+    <mxCell id="22" value="Feed anzeigen" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+      <mxGeometry x="500" y="140" width="160" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- UC: Profil anzeigen -->
+    <mxCell id="23" value="Profil anzeigen" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+      <mxGeometry x="500" y="260" width="160" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- UC: Post erstellen -->
+    <mxCell id="24" value="Post erstellen" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="500" y="400" width="160" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- UC: Post liken -->
+    <mxCell id="25" value="Post liken" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="500" y="520" width="160" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- UC: Kommentar schreiben -->
+    <mxCell id="26" value="Kommentar schreiben" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="500" y="640" width="160" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- UC: Nutzer folgen -->
+    <mxCell id="27" value="Nutzer folgen /&#xa;entfolgen" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="740" y="460" width="160" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- ===== ASSOZIATIONEN ===== -->
+
+    <!-- Besucher → Registrieren -->
+    <mxCell id="30" value="" style="endArrow=none;html=1;" edge="1" parent="1" source="10" target="20">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Besucher → Einloggen -->
+    <mxCell id="31" value="" style="endArrow=none;html=1;" edge="1" parent="1" source="10" target="21">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Besucher → Feed anzeigen -->
+    <mxCell id="32" value="" style="endArrow=none;html=1;" edge="1" parent="1" source="10" target="22">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Besucher → Profil anzeigen -->
+    <mxCell id="33" value="" style="endArrow=none;html=1;" edge="1" parent="1" source="10" target="23">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Nutzer → Post erstellen -->
+    <mxCell id="34" value="" style="endArrow=none;html=1;" edge="1" parent="1" source="11" target="24">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Nutzer → Post liken -->
+    <mxCell id="35" value="" style="endArrow=none;html=1;" edge="1" parent="1" source="11" target="25">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Nutzer → Kommentar schreiben -->
+    <mxCell id="36" value="" style="endArrow=none;html=1;" edge="1" parent="1" source="11" target="26">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Nutzer → Nutzer folgen -->
+    <mxCell id="37" value="" style="endArrow=none;html=1;" edge="1" parent="1" source="11" target="27">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- include: Einloggen -->
+    <mxCell id="40" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;" edge="1" parent="1" source="24" target="21">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="41" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;" edge="1" parent="1" source="25" target="21">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="42" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;" edge="1" parent="1" source="26" target="21">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="43" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;" edge="1" parent="1" source="27" target="21">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Legende -->
+    <mxCell id="50" value="Legende" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="990" y="100" width="100" height="30" as="geometry" />
+    </mxCell>
+    <mxCell id="51" value="Öffentlich" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="990" y="140" width="120" height="35" as="geometry" />
+    </mxCell>
+    <mxCell id="52" value="Öffentlich lesbar" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+      <mxGeometry x="990" y="190" width="120" height="35" as="geometry" />
+    </mxCell>
+    <mxCell id="53" value="Login erforderlich" style="ellipse;whiteSpace=wrap;html=1;fontSize=10;fillColor=#ffe6cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="990" y="240" width="120" height="35" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>

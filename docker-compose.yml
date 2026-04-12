@@ -1,0 +1,17 @@
+# Startet MongoDB lokal für die Entwicklung
+services:
+  mongodb:
+    image: mongo:7
+    container_name: dualnet-mongodb
+    ports:
+      # Port 27017 wird auf dem Host verfügbar gemacht
+      - "27017:27017"
+    volumes:
+      # Daten bleiben erhalten auch wenn der Container neu gestartet wird
+      - mongodb_data:/data/db
+    environment:
+      # Kein Passwort für lokale Entwicklung
+      MONGO_INITDB_DATABASE: dualnet
+
+volumes:
+  mongodb_data:

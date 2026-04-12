@@ -1,0 +1,51 @@
+# CI-Pipeline für das Backend
+# Läuft automatisch bei jedem Push und Pull Request
+name: Backend CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+    paths:
+      - 'backend/**'   # Nur auslösen wenn Backend-Dateien geändert wurden
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'backend/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Schritt 1: Code aus dem Repository laden
+      - name: Code laden
+        uses: actions/checkout@v4
+
+      # Schritt 2: Java 21 installieren (Temurin = OpenJDK)
+      - name: Java 21 einrichten
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      # Schritt 3: Maven-Cache nutzen (spart Download-Zeit)
+      - name: Maven Cache einrichten
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      # Schritt 4: Backend kompilieren und JAR bauen
+      # -DskipTests: Tests werden noch nicht ausgeführt (folgt im nächsten Semester)
+      - name: Backend bauen
+        working-directory: ./backend
+        run: mvn clean package -DskipTests
+
+      # Schritt 5: JAR-Datei als Artefakt speichern
+      - name: JAR-Artefakt speichern
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          path: backend/target/*.jar
+          retention-days: 7
