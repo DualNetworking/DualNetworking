@@ -49,7 +49,7 @@ Vollständige Anforderungen: [../SoftwareRequirementsSpecification.md](../Softwa
 
 - Hochschulprojekt mit festen Abgabeterminen
 - Team aus 3-5 Studierenden
-- Agile Entwicklung mit Scrum (2-Wochen-Sprints)
+- Agile Entwicklung mit Scrum (1-Wochen-Sprints)
 
 ---
 
