@@ -10,10 +10,10 @@ Das Team für DualNetworking wurde zusammengestellt. Jedes Mitglied hat eine Hau
 
 | Name | Hauptrolle |
 |------|-----------|
-| _(Teammitglied 1)_ | Backend-Entwicklung (Java/Spring Boot) |
-| _(Teammitglied 2)_ | Frontend-Entwicklung (React/TypeScript) |
-| _(Teammitglied 3)_ | Dokumentation & Scrum Master |
-| _(Teammitglied 4)_ | Datenbankdesign & DevOps |
+| _Ali_ | Backend-Entwicklung (Java/Spring Boot) |
+| _Sebo_ | Frontend-Entwicklung (React/TypeScript) |
+| _Max_ | Dokumentation & Scrum Master |
+| _Johannes_ | Datenbankdesign & DevOps |
 
 ### Projektidee: DualNetworking
 Wir haben uns für eine **Social-Media-Plattform** entschieden. Der Name "DualNetworking" spiegelt wider, dass sowohl das digitale Netzwerken als auch die duale Studienstruktur (Theorie + Praxis) gemeint sind.
