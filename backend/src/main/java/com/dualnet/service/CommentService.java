@@ -50,6 +50,19 @@ public class CommentService {
         return enrichComment(savedComment);
     }
 
+    // Löschen von Kommentar auf Basis von commentId & currentUserId
+    public void deleteComment(String commentId, String currentUserId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Kommentar nicht gefunden"));
+
+        // Nur der Autor darf löschen
+        if (!comment.getAuthorId().equals(currentUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Du darfst diesen Kommentar nicht löschen");
+        }
+
+        commentRepository.delete(comment);
+    }
+
     // Reichert einen Kommentar mit dem Benutzernamen des Autors an
     private Map<String, Object> enrichComment(Comment comment) {
         User author = userRepository.findById(comment.getAuthorId()).orElse(null);
@@ -64,4 +77,5 @@ public class CommentService {
                 "createdAt", comment.getCreatedAt().toString()
         );
     }
+
 }

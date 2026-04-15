@@ -29,3 +29,5 @@ public class Comment {
     // Zeitpunkt des Kommentars
     private LocalDateTime createdAt = LocalDateTime.now();
 }
+
+
