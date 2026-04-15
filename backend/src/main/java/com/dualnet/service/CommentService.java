@@ -50,7 +50,7 @@ public class CommentService {
         return enrichComment(savedComment);
     }
 
-    // Löschen von Kommentar auf Basis von commentId & currentUserId
+    // Löschen von Kommentaren auf Basis von commentId & currentUserId
     public void deleteComment(String commentId, String currentUserId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Kommentar nicht gefunden"));
