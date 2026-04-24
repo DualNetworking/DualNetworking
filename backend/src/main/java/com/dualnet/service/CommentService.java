@@ -1,20 +1,23 @@
 package com.dualnet.service;
 
 import com.dualnet.dto.CommentRequest;
+import com.dualnet.dto.CommentResponse;
 import com.dualnet.model.Comment;
 import com.dualnet.model.User;
 import com.dualnet.repository.CommentRepository;
 import com.dualnet.repository.PostRepository;
 import com.dualnet.repository.UserRepository;
+import com.dualnet.service.mapper.CommentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Map;
 
-// Enthält die Logik für Kommentare: laden und erstellen
+// Geschäftslogik für Kommentare: laden und erstellen.
+// Refactoring: Map<String,Object> ersetzt; deleteComment (toter Code) entfernt;
+// enrichComment-Logik in CommentMapper ausgelagert.
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -22,60 +25,45 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentMapper commentMapper;
 
-    // Gibt alle Kommentare zu einem Post zurück (älteste zuerst)
-    public List<Map<String, Object>> getComments(String postId) {
-        // Prüfen ob der Post existiert
-        postRepository.findById(postId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post nicht gefunden"));
+    // ===== Öffentliche Integration-Methoden =====
 
+    // Liefert alle Kommentare zu einem Post (älteste zuerst)
+    public List<CommentResponse> getComments(String postId) {
+        ensurePostExists(postId);
         return commentRepository.findByPostIdOrderByCreatedAtAsc(postId)
                 .stream()
-                .map(this::enrichComment)
+                .map(this::toResponseWithAuthor)
                 .toList();
     }
 
     // Erstellt einen neuen Kommentar unter einem Post
-    public Map<String, Object> addComment(String postId, CommentRequest request, String currentUserId) {
-        // Prüfen ob der Post existiert
-        postRepository.findById(postId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post nicht gefunden"));
+    public CommentResponse addComment(String postId, CommentRequest request, String currentUserId) {
+        ensurePostExists(postId);
+        Comment newComment = buildComment(postId, request, currentUserId);
+        Comment savedComment = commentRepository.save(newComment);
+        return toResponseWithAuthor(savedComment);
+    }
 
+    // ===== Private Operationen =====
+
+    private Comment buildComment(String postId, CommentRequest request, String authorId) {
         Comment comment = new Comment();
         comment.setPostId(postId);
-        comment.setAuthorId(currentUserId);
+        comment.setAuthorId(authorId);
         comment.setContent(request.getContent());
-
-        Comment savedComment = commentRepository.save(comment);
-        return enrichComment(savedComment);
+        return comment;
     }
 
-    // Löschen von Kommentaren auf Basis von commentId & currentUserId
-    public void deleteComment(String commentId, String currentUserId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Kommentar nicht gefunden"));
-
-        // Nur der Autor darf löschen
-        if (!comment.getAuthorId().equals(currentUserId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Du darfst diesen Kommentar nicht löschen");
+    private void ensurePostExists(String postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post nicht gefunden");
         }
-
-        commentRepository.delete(comment);
     }
 
-    // Reichert einen Kommentar mit dem Benutzernamen des Autors an
-    private Map<String, Object> enrichComment(Comment comment) {
+    private CommentResponse toResponseWithAuthor(Comment comment) {
         User author = userRepository.findById(comment.getAuthorId()).orElse(null);
-        String authorUsername = author != null ? author.getUsername() : "Unbekannt";
-
-        return Map.of(
-                "id", comment.getId(),
-                "postId", comment.getPostId(),
-                "content", comment.getContent(),
-                "authorId", comment.getAuthorId(),
-                "authorUsername", authorUsername,
-                "createdAt", comment.getCreatedAt().toString()
-        );
+        return commentMapper.toResponse(comment, author);
     }
-
 }

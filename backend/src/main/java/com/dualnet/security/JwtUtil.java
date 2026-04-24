@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
-// Hilfklasse für alle JWT-Operationen: Token erstellen und lesen
+// Hilfsklasse für alle JWT-Operationen: Token erstellen und lesen.
 @Component
 public class JwtUtil {
 
@@ -29,10 +29,10 @@ public class JwtUtil {
     // Erstellt einen neuen JWT-Token für den gegebenen Nutzer
     public String generateToken(String userId) {
         return Jwts.builder()
-                .subject(userId)                              // Nutzer-ID als Subject speichern
-                .issuedAt(new Date())                         // Ausstellungszeitpunkt
-                .expiration(new Date(System.currentTimeMillis() + expiration)) // Ablaufzeit
-                .signWith(getSigningKey())                    // Token signieren
+                .subject(userId)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -45,7 +45,6 @@ public class JwtUtil {
     public boolean isTokenValid(String token) {
         try {
             Claims claims = getClaims(token);
-            // Token ist gültig wenn Ablaufzeit in der Zukunft liegt
             return claims.getExpiration().after(new Date());
         } catch (Exception e) {
             // Ungültige Signatur, abgelaufen oder falsches Format → ungültig

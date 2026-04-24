@@ -1,92 +1,95 @@
 package com.dualnet.service;
 
 import com.dualnet.dto.PostRequest;
+import com.dualnet.dto.PostResponse;
 import com.dualnet.model.Post;
 import com.dualnet.model.User;
 import com.dualnet.repository.PostRepository;
 import com.dualnet.repository.UserRepository;
+import com.dualnet.service.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Map;
 
-// Enthält die Logik für Posts: erstellen, laden, liken
+// Geschäftslogik für Posts: erstellen, laden, liken.
+// Refactoring: Map<String,Object> durch PostResponse ersetzt; enrichPost in PostMapper ausgelagert.
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final PostMapper postMapper;
 
-    // Gibt alle Posts zurück (neueste zuerst) – das ist der Feed
-    public List<Map<String, Object>> getFeed() {
-        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
-        return posts.stream()
-                .map(this::enrichPost)
+    // ===== Öffentliche Integration-Methoden =====
+
+    // Liefert alle Posts für den Feed (neueste zuerst)
+    public List<PostResponse> getFeed() {
+        return postRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(this::toResponseWithAuthor)
                 .toList();
     }
 
     // Erstellt einen neuen Post für den eingeloggten Nutzer
-    public Map<String, Object> createPost(PostRequest request, String currentUserId) {
+    public PostResponse createPost(PostRequest request, String currentUserId) {
+        Post newPost = buildPost(request, currentUserId);
+        Post savedPost = postRepository.save(newPost);
+        return toResponseWithAuthor(savedPost);
+    }
+
+    // Fügt einen Like hinzu (idempotent – mehrfaches Liken ändert nichts)
+    public PostResponse likePost(String postId, String currentUserId) {
+        Post post = findPostOrThrow(postId);
+        addLikeIfMissing(post, currentUserId);
+        Post savedPost = postRepository.save(post);
+        return toResponseWithAuthor(savedPost);
+    }
+
+    // Entfernt einen Like (idempotent)
+    public PostResponse unlikePost(String postId, String currentUserId) {
+        Post post = findPostOrThrow(postId);
+        post.getLikes().remove(currentUserId);
+        Post savedPost = postRepository.save(post);
+        return toResponseWithAuthor(savedPost);
+    }
+
+    // Liefert alle Posts eines bestimmten Autors (für Profilseite).
+    // Ersetzt die vorherige package-private enrichPost-Hintertür für UserService.
+    public List<PostResponse> getPostsByAuthor(String authorId) {
+        return postRepository.findByAuthorIdOrderByCreatedAtDesc(authorId)
+                .stream()
+                .map(this::toResponseWithAuthor)
+                .toList();
+    }
+
+    // ===== Private Operationen (jeweils eine Aufgabe, eine Abstraktionsebene) =====
+
+    private Post buildPost(PostRequest request, String authorId) {
         Post post = new Post();
-        post.setAuthorId(currentUserId);
+        post.setAuthorId(authorId);
         post.setContent(request.getContent());
         post.setImageUrl(request.getImageUrl());
-
-        Post savedPost = postRepository.save(post);
-        return enrichPost(savedPost);
+        return post;
     }
 
-    // Fügt den Like eines Nutzers zu einem Post hinzu
-    public Map<String, Object> likePost(String postId, String currentUserId) {
-        Post post = findPostOrThrow(postId);
-
-        // Nur liken wenn noch nicht geliked
-        if (!post.getLikes().contains(currentUserId)) {
-            post.getLikes().add(currentUserId);
-            postRepository.save(post);
+    private void addLikeIfMissing(Post post, String userId) {
+        if (!post.getLikes().contains(userId)) {
+            post.getLikes().add(userId);
         }
-
-        return enrichPost(post);
     }
 
-    // Entfernt den Like eines Nutzers von einem Post
-    public Map<String, Object> unlikePost(String postId, String currentUserId) {
-        Post post = findPostOrThrow(postId);
-
-        post.getLikes().remove(currentUserId);
-        postRepository.save(post);
-
-        return enrichPost(post);
-    }
-
-    // Hilfmethode: Post anhand ID laden oder 404 werfen
     private Post findPostOrThrow(String postId) {
         return postRepository.findById(postId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post nicht gefunden"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Post nicht gefunden"));
     }
 
-    // Reichert einen Post mit Autorendaten an (damit das Frontend Benutzername anzeigen kann)
-    // package-private damit UserService diese Methode nutzen kann
-    Map<String, Object> enrichPost(Post post) {
-        // Autor aus der Datenbank laden
-        User author = userRepository.findById(post.getAuthorId())
-                .orElse(null);
-
-        String authorUsername = author != null ? author.getUsername() : "Unbekannt";
-
-        return Map.of(
-                "id", post.getId(),
-                "content", post.getContent(),
-                "imageUrl", post.getImageUrl() != null ? post.getImageUrl() : "",
-                "authorId", post.getAuthorId(),
-                "authorUsername", authorUsername,
-                "likeCount", post.getLikes().size(),
-                "likes", post.getLikes(),
-                "createdAt", post.getCreatedAt().toString()
-        );
+    private PostResponse toResponseWithAuthor(Post post) {
+        User author = userRepository.findById(post.getAuthorId()).orElse(null);
+        return postMapper.toResponse(post, author);
     }
 }
