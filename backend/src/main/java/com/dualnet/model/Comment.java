@@ -23,11 +23,9 @@ public class Comment {
     // ID des Nutzers, der den Kommentar geschrieben hat
     private String authorId;
 
-    // Text des Kommentars (max. 300 Zeichen)
+    // Text des Kommentars (max. 300 Zeichen, wird im DTO geprüft)
     private String content;
 
     // Zeitpunkt des Kommentars
     private LocalDateTime createdAt = LocalDateTime.now();
 }
-
-

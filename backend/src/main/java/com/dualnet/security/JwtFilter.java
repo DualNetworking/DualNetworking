@@ -15,11 +15,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 
-// Dieser Filter läuft bei JEDER HTTP-Anfrage und prüft den JWT-Token
-// Wenn der Token gültig ist, wird der Nutzer in Spring Security eingetragen
+// Liest den JWT-Token aus dem Authorization-Header und authentifiziert
+// den Nutzer für Spring Security, falls der Token gültig ist.
+//
+// Refactoring: doFilterInternal hat jetzt nur noch die Aufgabe der Orchestrierung.
+// Die Detail-Schritte (Header lesen, Authentifizierung setzen) liegen in eigenen Methoden.
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
+
+    private static final String AUTH_HEADER = "Authorization";
+    private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
@@ -28,41 +34,39 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        String token = extractBearerToken(request);
 
-        // Authorization-Header lesen (Format: "Bearer <token>")
-        String authHeader = request.getHeader("Authorization");
-
-        // Wenn kein Token vorhanden, Anfrage ohne Authentifizierung weitergeben
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // "Bearer " (7 Zeichen) entfernen, um den reinen Token zu bekommen
-        String token = authHeader.substring(7);
-
-        // Token prüfen und wenn gültig, Nutzer authentifizieren
-        if (jwtUtil.isTokenValid(token)) {
+        if (token != null && jwtUtil.isTokenValid(token)) {
             String userId = jwtUtil.extractUserId(token);
-
-            // Nutzer aus der Datenbank laden
-            userRepository.findById(userId).ifPresent(user -> {
-                // Authentifizierungsobjekt für Spring Security erstellen
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                user,           // Nutzer-Objekt (als Principal)
-                                null,           // Kein Passwort nötig (bereits durch Token geprüft)
-                                Collections.emptyList() // Keine Rollen/Berechtigungen
-                        );
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // Nutzer in Spring Security Context eintragen
-                // Danach weiß Spring Security wer diese Anfrage stellt
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            });
+            authenticateUser(userId, request);
         }
 
-        // Anfrage an den nächsten Filter / Controller weitergeben
         filterChain.doFilter(request, response);
+    }
+
+    // Extrahiert den reinen Token aus dem Authorization-Header.
+    // Gibt null zurück, wenn kein Bearer-Token vorhanden ist.
+    private String extractBearerToken(HttpServletRequest request) {
+        String authHeader = request.getHeader(AUTH_HEADER);
+        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
+            return null;
+        }
+        return authHeader.substring(BEARER_PREFIX.length());
+    }
+
+    // Lädt den Nutzer und setzt ihn in den Spring Security Context.
+    // Wenn die userId nicht (mehr) existiert, passiert einfach nichts –
+    // die Anfrage wird dann unauthentifiziert weitergegeben.
+    private void authenticateUser(String userId, HttpServletRequest request) {
+        userRepository.findById(userId).ifPresent(user -> {
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            user,
+                            null,
+                            Collections.emptyList()
+                    );
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        });
     }
 }

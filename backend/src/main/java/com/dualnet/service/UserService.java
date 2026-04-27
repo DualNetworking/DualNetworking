@@ -1,87 +1,92 @@
 package com.dualnet.service;
 
+import com.dualnet.dto.PostResponse;
+import com.dualnet.dto.UserProfileResponse;
 import com.dualnet.model.User;
-import com.dualnet.repository.PostRepository;
 import com.dualnet.repository.UserRepository;
+import com.dualnet.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Map;
 
-// Enthält die Logik für Nutzerprofile und Folgen/Entfolgen
+// Geschäftslogik für Profile und Folgen/Entfolgen.
+// Refactoring: IOSP angewendet – öffentliche Methoden sind reine Integration,
+// die eigentliche Listen-Manipulation liegt in privaten Operationen.
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PostRepository postRepository;
+    private final UserMapper userMapper;
     private final PostService postService;
 
-    // Gibt das Profil eines Nutzers anhand des Benutzernamens zurück
-    public Map<String, Object> getProfile(String username) {
-        User user = findUserOrThrow(username);
+    // ===== Öffentliche Integration-Methoden =====
 
-        return Map.of(
-                "id", user.getId(),
-                "username", user.getUsername(),
-                "bio", user.getBio() != null ? user.getBio() : "",
-                "followersCount", user.getFollowers().size(),
-                "followingCount", user.getFollowing().size()
-        );
+    public UserProfileResponse getProfile(String username) {
+        User user = findUserByUsernameOrThrow(username);
+        return userMapper.toProfileResponse(user);
     }
 
-    // Gibt alle Posts eines Nutzers zurück (für die Profilseite)
-    public List<Map<String, Object>> getUserPosts(String username) {
-        User user = findUserOrThrow(username);
-
-        return postRepository.findByAuthorIdOrderByCreatedAtDesc(user.getId())
-                .stream()
-                .map(post -> postService.enrichPost(post))
-                .toList();
+    public List<PostResponse> getUserPosts(String username) {
+        User user = findUserByUsernameOrThrow(username);
+        return postService.getPostsByAuthor(user.getId());
     }
 
-    // Lässt einen Nutzer einem anderen folgen
     public void followUser(String targetUsername, String currentUserId) {
-        User target = findUserOrThrow(targetUsername);
-        User currentUser = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nutzer nicht gefunden"));
-
-        // Sich selbst folgen verhindern
-        if (target.getId().equals(currentUserId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Du kannst dir nicht selbst folgen");
-        }
-
-        // Nur hinzufügen wenn noch nicht gefolgt wird
-        if (!target.getFollowers().contains(currentUserId)) {
-            target.getFollowers().add(currentUserId);
-            currentUser.getFollowing().add(target.getId());
-
-            // Beide Nutzer aktualisieren
-            userRepository.save(target);
-            userRepository.save(currentUser);
-        }
+        User target = findUserByUsernameOrThrow(targetUsername);
+        User currentUser = findUserByIdOrThrow(currentUserId);
+        ensureNotSelfFollow(target.getId(), currentUserId);
+        addFollowRelationship(target, currentUser);
+        persistBoth(target, currentUser);
     }
 
-    // Lässt einen Nutzer einem anderen entfolgen
     public void unfollowUser(String targetUsername, String currentUserId) {
-        User target = findUserOrThrow(targetUsername);
-        User currentUser = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nutzer nicht gefunden"));
+        User target = findUserByUsernameOrThrow(targetUsername);
+        User currentUser = findUserByIdOrThrow(currentUserId);
+        removeFollowRelationship(target, currentUser);
+        persistBoth(target, currentUser);
+    }
 
-        target.getFollowers().remove(currentUserId);
+    // ===== Private Operationen (eine Aufgabe, eine Abstraktionsebene) =====
+
+    // Operation: reine Listen-Manipulation, keine Repository-Aufrufe
+    private void addFollowRelationship(User target, User currentUser) {
+        if (target.getFollowers().contains(currentUser.getId())) {
+            return;
+        }
+        target.getFollowers().add(currentUser.getId());
+        currentUser.getFollowing().add(target.getId());
+    }
+
+    private void removeFollowRelationship(User target, User currentUser) {
+        target.getFollowers().remove(currentUser.getId());
         currentUser.getFollowing().remove(target.getId());
+    }
 
+    private void persistBoth(User target, User currentUser) {
         userRepository.save(target);
         userRepository.save(currentUser);
     }
 
-    // Hilfsmethode: Nutzer anhand Benutzername laden oder 404 werfen
-    private User findUserOrThrow(String username) {
+    private void ensureNotSelfFollow(String targetId, String currentUserId) {
+        if (targetId.equals(currentUserId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Du kannst dir nicht selbst folgen");
+        }
+    }
+
+    private User findUserByUsernameOrThrow(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Nutzer '" + username + "' nicht gefunden"));
+    }
+
+    private User findUserByIdOrThrow(String userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Nutzer nicht gefunden"));
     }
 }
