@@ -14,3 +14,6 @@ export async function addComment(postId: string, content: string): Promise<Comme
   const response = await axios.post<Comment>(`/api/posts/${postId}/comments`, { content })
   return response.data
 }
+
+
+// Löscht einen Kommentare
