@@ -131,13 +131,13 @@ DualNetworking ist eine Social-Media-Webanwendung bestehend aus einem React/Type
 
 | Werkzeug | Einsatzbereich | Status |
 |---------|---------------|--------|
-| JUnit 5 | Backend Unit Tests | ✅ Verfügbar (in pom.xml) |
-| Mockito | Backend Mocking | ✅ Verfügbar (in pom.xml) |
-| Spring Boot Test / MockMvc | API Integrationstests | ✅ Verfügbar (in pom.xml) |
-| Flapdoodle Embed Mongo | MongoDB In-Memory für Tests | 🔄 Einzurichten |
-| Vitest | Frontend Unit Tests | 🔄 Einzurichten |
-| React Testing Library | Frontend Komponenten-Tests | 🔄 Einzurichten |
-| GitHub Actions | CI – automatische Testausführung | ✅ Vorhanden |
+| JUnit 5 | Backend Unit Tests | Verfügbar (in pom.xml) |
+| Mockito | Backend Mocking | Verfügbar (in pom.xml) |
+| Spring Boot Test / MockMvc | API Integrationstests | Verfügbar (in pom.xml) |
+| Flapdoodle Embed Mongo | MongoDB In-Memory für Tests | Einzurichten |
+| Vitest | Frontend Unit Tests | Einzurichten |
+| React Testing Library | Frontend Komponenten-Tests | Einzurichten |
+| GitHub Actions | CI – automatische Testausführung | Vorhanden |
 
 ---
 
