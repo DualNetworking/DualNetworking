@@ -157,13 +157,39 @@ Alle Testfälle werden in dieser Datei mit Status gepflegt:
 
 ### 5.2 Aktueller Teststatus
 
-| Test-ID | Status | Implementiert in | Git-Commit |
-|---------|--------|-----------------|------------|
-| UT-BE-01 bis UT-BE-13 | Geplant | – | – |
-| UT-FE-01 bis UT-FE-07 | Geplant | – | – |
-| IT-01 bis IT-11 | Geplant | – | – |
-| SM-01 bis SM-10 | Geplant | – | – |
-| SEC-01 bis SEC-05 | Geplant | – | – |
+| Test-ID | Status | Implementiert in |
+|---------|--------|-----------------|
+| UT-BE-01 | Bestanden | `service/AuthServiceTest.java` |
+| UT-BE-02 | Bestanden | `service/AuthServiceTest.java` |
+| UT-BE-03 | Bestanden | `service/AuthServiceTest.java` |
+| UT-BE-04 | Bestanden | `security/JwtUtilTest.java` |
+| UT-BE-05 | Bestanden | `security/JwtUtilTest.java` |
+| UT-BE-06 | Bestanden | `service/PostServiceTest.java` |
+| UT-BE-07 | Bestanden | `service/PostServiceTest.java` |
+| UT-BE-08 | Bestanden | `service/PostServiceTest.java` |
+| UT-BE-09 | Bestanden | `service/CommentServiceTest.java` |
+| UT-BE-10 | Bestanden | `service/CommentServiceTest.java` |
+| UT-BE-11 | Bestanden | `service/UserServiceTest.java` |
+| UT-BE-12 | Bestanden | `service/UserServiceTest.java` |
+| UT-BE-13 | Bestanden | `service/UserServiceTest.java` |
+| UT-FE-01 | Bestanden | `pages/LoginPage.test.tsx` |
+| UT-FE-02 | Bestanden | `pages/LoginPage.test.tsx` |
+| UT-FE-03 | Bestanden | `components/PostCard.test.tsx` |
+| UT-FE-04 | Bestanden | `components/PostCard.test.tsx` |
+| UT-FE-05 | Bestanden | `components/CommentSection.test.tsx` |
+| UT-FE-06 | Bestanden | `components/FollowButton.test.tsx` |
+| UT-FE-07 | Bestanden | `components/Navbar.test.tsx` |
+| IT-01 | Bestanden | `controller/AuthControllerTest.java` |
+| IT-02 | Bestanden | `controller/AuthControllerTest.java` |
+| IT-03 | Bestanden | `controller/AuthControllerTest.java` |
+| IT-04 | Bestanden | `controller/AuthControllerTest.java` |
+| IT-05 | Bestanden | `controller/PostControllerTest.java` |
+| IT-06 | Bestanden | `controller/PostControllerTest.java` |
+| IT-07 | Bestanden | `controller/PostControllerTest.java` |
+| IT-08 | Bestanden | `controller/PostControllerTest.java` |
+| IT-09 bis IT-11 | Geplant | – |
+| SM-01 bis SM-10 | Geplant | – |
+| SEC-01 bis SEC-05 | Geplant | – |
 
 ### 5.3 Rückverfolgbarkeit zu User Stories
 

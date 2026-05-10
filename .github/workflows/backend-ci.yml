@@ -36,13 +36,17 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      # Schritt 4: Backend kompilieren und JAR bauen
-      # -DskipTests: Tests werden noch nicht ausgeführt (folgt im nächsten Semester)
+      # Schritt 4: Tests ausführen
+      - name: Tests ausführen
+        working-directory: ./backend
+        run: mvn test
+
+      # Schritt 5: Backend kompilieren und JAR bauen
       - name: Backend bauen
         working-directory: ./backend
-        run: mvn clean package -DskipTests
+        run: mvn package -DskipTests
 
-      # Schritt 5: JAR-Datei als Artefakt speichern
+      # Schritt 6: JAR-Datei als Artefakt speichern
       - name: JAR-Artefakt speichern
         uses: actions/upload-artifact@v4
         with:

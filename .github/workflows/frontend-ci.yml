@@ -34,12 +34,17 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
-      # Schritt 4: TypeScript kompilieren und App bauen
+      # Schritt 4: Unit-Tests ausführen
+      - name: Tests ausführen
+        working-directory: ./frontend
+        run: npm test
+
+      # Schritt 5: TypeScript kompilieren und App bauen
       - name: Frontend bauen
         working-directory: ./frontend
         run: npm run build
 
-      # Schritt 5: Build-Artefakt speichern (optional, für Deployment nützlich)
+      # Schritt 6: Build-Artefakt speichern (optional, für Deployment nützlich)
       - name: Build-Artefakt speichern
         uses: actions/upload-artifact@v4
         with:
