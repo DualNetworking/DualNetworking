@@ -16,6 +16,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+
     steps:
       # Schritt 1: Code aus dem Repository laden
       - name: Code laden
@@ -36,7 +42,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      # Schritt 4: Tests ausführen
+      # Schritt 4: Tests ausführen (MongoDB läuft als Service-Container)
       - name: Tests ausführen
         working-directory: ./backend
         run: mvn test
