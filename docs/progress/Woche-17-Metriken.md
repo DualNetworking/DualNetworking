@@ -1,22 +1,110 @@
 # Woche 17 – Blog 14: Software-Metriken
 
-## Aufgabe 1a – Drei gewählte Metriken
+*Veröffentlicht: 19.05.2026*
 
-Zusätzlich zu den Softwaretestmetriken (Code Coverage, Anzahl Testfälle) messen wir für DualNet die folgenden drei Metriken aus den Vorlesungsfolien (Folie 6):
+---
+
+## Zusammenfassung der heute studierten Metriken
+
+In der heutigen Vorlesungseinheit haben wir uns mit Metriken für das **Anforderungsmodell** beschäftigt. Eine Gruppe aus unserem Kurs hat die folgenden Metriken präsentiert:
+
+### Größenmetriken
+
+**Function Points (nach Albrecht, 1979)**  
+Misst den funktionalen Umfang einer Software aus Benutzersicht – technologieunabhängig, nicht codebasiert. Fünf Funktionstypen werden gewichtet summiert:
+
+| Funktionstyp | Einfach | Mittel | Komplex |
+|---|---|---|---|
+| ILF (interne Dateien) | 7 | 10 | 15 |
+| EIF (externe Schnittstellen) | 5 | 7 | 10 |
+| EI (externe Eingaben) | 3 | 4 | 6 |
+| EO (externe Ausgaben) | 4 | 5 | 7 |
+| EQ (externe Abfragen) | 3 | 4 | 6 |
+
+**Formel:** `AFP = UFP × (0,65 + 0,01 × ΣC_i)`  
+(UFP = Summe gewichteter Funktionstypen, C_i = 14 Einflussfaktoren je 0–5)
+
+**Berechnung für DualNet:**
+
+| Funktion | Typ | Kompl. | Gew. |
+|---|---|---|---|
+| Benutzerkonto | ILF | Einfach | 7 |
+| Beitrag (Post + Likes) | ILF | Mittel | 10 |
+| Kommentar | ILF | Einfach | 7 |
+| Registrierung | EI | Mittel | 4 |
+| Login / Logout | EI | Einfach | 3+3 |
+| Beitrag erstellen | EI | Mittel | 4 |
+| Beitrag liken/entliken | EI | Einfach | 3 |
+| Kommentar schreiben | EI | Einfach | 3 |
+| Beiträge laden | EO | Mittel | 5 |
+| Benutzer abfragen | EQ | Einfach | 3 |
+
+```
+UFP = 31 (ILF) + 29 (EI) + 9 (EO) + 9 (EQ) = 78
+VAF = 0,65 + 0,01 × 27 = 0,92
+AFP = 78 × 0,92 ≈ 72 Function Points
+```
+
+---
+
+### Qualitätsmetriken
+
+**Mehrdeutigkeit**  
+Zählt mehrdeutige Modifikatoren in Anforderungen (z. B. „viele", „groß", „benutzerfreundlich"). Ziel: 0 – jede Anforderung soll eindeutig formuliert sein.
+
+**Vollständigkeit**  
+Misst offene oder unentschiedene Punkte (TBD-Marker).  
+`Grad = 1 − (offene Punkte / Gesamtanforderungen)`  
+Ziel: Wert möglichst nahe 1,0.
+
+**Unverständlichkeit**  
+Anzahl der Abschnitte und Unterabschnitte im Anforderungsdokument. Empfehlung: max. 3–4 Gliederungsebenen.
+
+---
+
+### Stabilitätsmetriken
+
+**Volatilität**  
+Misst wie häufig Anforderungen geändert werden.  
+`Volatilität = Summe aller Änderungen / Anzahl Anforderungen`  
+Hohe Volatilität = instabile, risikobehaftete Anforderungen.
+
+**Zeit pro Änderung**  
+Aufwand (in Stunden) pro Aktivität bei einer beantragten Änderung – hilft Engpässe im Änderungsprozess zu erkennen.
+
+---
+
+### Prozessmetriken
+
+**Rückverfolgbarkeit**  
+`Trace = 1 − (nicht verfolgbare Anforderungen / Gesamtanforderungen)`  
+Jede Anforderung muss bis zum Code zurückverfolgbar sein.
+
+**Modellklarheit**  
+Beschreibende Seiten pro UML-Modell. Zu viele Seiten = zu komplex, zu wenige = unvollständig.
+
+**UML-Fehler**  
+Anzahl syntaktischer und semantischer Fehler in UML-Diagrammen (fehlende Kardinalitäten, falsche Beziehungstypen etc.).
+
+---
+
+## Aufgabe 1a – Drei gewählte Metriken für DualNet
+
+Zusätzlich zu den Softwaretestmetriken (Code Coverage, Anzahl Testfälle) messen wir für DualNet die folgenden drei Metriken aus den Vorlesungsfolien (Folie 6). Die Auswahl orientiert sich am Tipp der Aufgabe: „Welche Messwerte zeigen die Höhepunkte Ihres Projekts?"
 
 ---
 
 ### Metrik 1: Zyklomatische Komplexität (Cyclomatic Complexity, CC)
 
-**Kategorie:** Codequalität → Komplexität (Vorlesungsfolien S. 6)
+**Kategorie:** Codequalität → Komplexität (Vorlesungsfolien S. 6, Aufgabe 2)
 
 **Zielsetzung:**  
-Die zyklomatische Komplexität misst die Anzahl linear unabhängiger Pfade durch eine Methode. Sie zeigt, wie schwer eine Methode zu testen und zu verstehen ist. Je höher der Wert, desto mehr Testfälle sind nötig, um alle Verzweigungen abzudecken.
+Die zyklomatische Komplexität misst die Anzahl linear unabhängiger Pfade durch eine Methode. Sie zeigt, wie schwer eine Methode zu testen und zu verstehen ist. Je höher der Wert, desto mehr Testfälle sind nötig, um alle Verzweigungen abzudecken. Für DualNet zeigt diese Metrik besonders gut, dass unser IOSP-Refactoring (Integration-Operation Separation Principle) die Komplexität bewusst niedrig hält.
 
 **Berechnung:**  
 `CC = Anzahl der Entscheidungspunkte + 1`
 
-Entscheidungspunkte sind: `if`, `else if`, `while`, `for`, `case`, `catch`, `&&`, `||`, ternärer Operator.
+Entscheidungspunkte: `if`, `else if`, `while`, `for`, `case`, `catch`, `&&`, `||`, ternärer Operator.
 
 **Richtwerte:**
 | CC | Bewertung |
@@ -30,17 +118,15 @@ Entscheidungspunkte sind: `if`, `else if`, `while`, `for`, `case`, `catch`, `&&`
 
 ```java
 // PostService.java – addLikeIfMissing()
-// Entscheidungspunkt: 1x if → CC = 2
+// Entscheidungspunkt: 1× if → CC = 2
 private void addLikeIfMissing(Post post, String userId) {
     if (!post.getLikes().contains(userId)) {   // +1 Entscheidungspunkt
         post.getLikes().add(userId);
     }
 }
-```
 
-```java
 // UserService.java – addFollowRelationship()
-// Entscheidungspunkte: 1x if → CC = 2
+// Entscheidungspunkt: 1× if → CC = 2
 private void addFollowRelationship(User target, User currentUser) {
     if (target.getFollowers().contains(currentUser.getId())) {  // +1 Entscheidungspunkt
         return;
@@ -48,11 +134,9 @@ private void addFollowRelationship(User target, User currentUser) {
     target.getFollowers().add(currentUser.getId());
     currentUser.getFollowing().add(target.getId());
 }
-```
 
-```java
 // UserService.java – ensureNotSelfFollow()
-// Entscheidungspunkte: 1x if → CC = 2
+// Entscheidungspunkt: 1× if → CC = 2
 private void ensureNotSelfFollow(String targetId, String currentUserId) {
     if (targetId.equals(currentUserId)) {   // +1 Entscheidungspunkt
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "...");
@@ -60,20 +144,21 @@ private void ensureNotSelfFollow(String targetId, String currentUserId) {
 }
 ```
 
-**Öffentliche Integrationsmethoden haben CC = 1**, da sie keine eigene Verzweigungslogik enthalten – das ist eine bewusste Designentscheidung (IOSP-Prinzip). Diese scheinbar „schlechte" Metrik (CC = 1 bedeutet nicht automatisch, dass die Methode trivial ist) erfordert daher keine Änderung:
+**Warum CC = 1 hier kein Problem ist:**  
+Die öffentlichen Integrationsmethoden haben bewusst CC = 1, da sie keine eigene Verzweigungslogik enthalten. Das ist ein Highlight unseres IOSP-Designs – keine Änderung erforderlich:
 
 ```java
 // PostService.java – likePost()
-// CC = 1 (keine Verzweigung), trotzdem wichtige Integrationsmethode
+// CC = 1: reine Integration, Logik liegt in addLikeIfMissing()
 public PostResponse likePost(String postId, String currentUserId) {
-    Post post = findPostOrThrow(postId);
-    addLikeIfMissing(post, currentUserId);
+    Post post = findPostOrThrow(postId);        // delegiert an private Op.
+    addLikeIfMissing(post, currentUserId);      // delegiert an private Op.
     Post savedPost = postRepository.save(post);
     return toResponseWithAuthor(savedPost);
 }
 ```
 
-**Werkzeug:** PMD über `maven-pmd-plugin` – automatisch in der CI/CD-Pipeline (siehe 1b)
+**Werkzeug:** PMD über `maven-pmd-plugin` – automatisch in der CI/CD-Pipeline
 
 ---
 
@@ -82,36 +167,36 @@ public PostResponse likePost(String postId, String currentUserId) {
 **Kategorie:** Codequalität → Unverständlichkeit (Vorlesungsfolien S. 6)
 
 **Zielsetzung:**  
-Diese Metrik misst, wie gut der Code dokumentiert ist. Ein zu niedriger Wert deutet auf schlechte Lesbarkeit hin. Ein zu hoher Wert kann auf übermäßig komplexen Code hindeuten, der viele Erklärungen braucht.
+Misst wie gut der Code dokumentiert ist. Diese Metrik zeigt ein Highlight unseres Projekts: Wir kommentieren bewusst das *Warum* (Designentscheidungen, Refactoring-Gründe), nicht das *Was* – selbsterklärender Code braucht keine Kommentare.
 
 **Berechnung:**  
 `Kommentaranteil = (Anzahl Kommentarzeilen / Gesamtzeilen) × 100`
 
-**Richtwert:** 10–30 % sind angemessen für professionellen Code.
+**Richtwert:** 10–30 % gelten als angemessen.
 
-**Berechnung am DualNet-Beispiel (PostService.java):**
+**Berechnung am DualNet-Beispiel (PostService.java, 95 Zeilen):**
 
 ```
-Gesamtzeilen: 95
-Kommentarzeilen (Zeilen die mit // oder /* beginnen): ca. 14
-→ Kommentaranteil = 14/95 × 100 ≈ 14,7 %
+Kommentarzeilen (// oder /* …): ca. 14
+→ Kommentaranteil = 14 / 95 × 100 ≈ 14,7 %  ✓ im Zielbereich
 ```
 
-Dies liegt im guten Bereich. Die Kommentare erläutern dabei bewusst das Design (z.B. IOSP-Refactoring) und nicht triviale Implementierungsdetails:
+Die Kommentare erläutern Designentscheidungen, nicht triviale Details:
 
 ```java
+// Geschäftslogik für Posts: erstellen, laden, liken.
+// Refactoring: Map<String,Object> durch PostResponse ersetzt; enrichPost in PostMapper ausgelagert.
+
+// ===== Öffentliche Integration-Methoden =====
+
 // Liefert alle Posts für den Feed (neueste zuerst)
-public List<PostResponse> getFeed() { ... }
-
-// ===== Private Operationen (jeweils eine Aufgabe, eine Abstraktionsebene) =====
-
 // Fügt einen Like hinzu (idempotent – mehrfaches Liken ändert nichts)
-public PostResponse likePost(String postId, String currentUserId) { ... }
 ```
 
-**Hinweis:** Methodennamen wie `findPostOrThrow()` oder `ensureNotSelfFollow()` sind bewusst so benannt, dass sie keinen Kommentar benötigen. Dort ist der Kommentaranteil 0 – das ist kein Mangel, sondern gutes Design (selbsterklärender Code).
+**Warum 0 % Kommentare in manchen Methoden kein Problem ist:**  
+Methoden wie `findPostOrThrow()` oder `ensureNotSelfFollow()` sind so benannt, dass ihr Name bereits alles erklärt. Fehlende Kommentare sind hier gutes Design, nicht ein Mangel.
 
-**Werkzeug:** Shell-Skript in der CI/CD-Pipeline – zählt Kommentarzeilen mit `grep` (siehe 1b)
+**Werkzeug:** Shell-Skript mit `grep` und `wc` – automatisch in der CI/CD-Pipeline
 
 ---
 
@@ -120,55 +205,53 @@ public PostResponse likePost(String postId, String currentUserId) { ... }
 **Kategorie:** Codequalität → Wartbarkeit (Vorlesungsfolien S. 6)
 
 **Zielsetzung:**  
-Der SMI misst die Reife und Stabilität einer Software-Version. Er zeigt, wie viel des Codes verändert wurde – viele Änderungen deuten auf instabilen oder unreifen Code hin. Ein SMI nahe 1.0 ist ideal.
+Der SMI misst die Reife und Stabilität eines Software-Releases. Er zeigt, wie viel des Codes sich gegenüber dem letzten Stand verändert hat. Ein SMI nahe 1,0 bedeutet stabiler, reifer Code.
 
 **Berechnung:**  
 ```
-SMI = (Mt - Fc - Fa - Fd) / Mt
+SMI = (Mt − Fc − Fa − Fd) / Mt
 ```
-- `Mt` = Anzahl der Java-Source-Dateien im aktuellen Release  
-- `Fc` = Anzahl geänderter Dateien seit letztem Release  
-- `Fa` = Anzahl neu hinzugefügter Dateien  
-- `Fd` = Anzahl gelöschter Dateien  
+| Variable | Bedeutung |
+|---|---|
+| `Mt` | Anzahl Java-Source-Dateien im aktuellen Release |
+| `Fc` | Anzahl geänderter Dateien seit letztem Release |
+| `Fa` | Anzahl neu hinzugefügter Dateien |
+| `Fd` | Anzahl gelöschter Dateien |
 
 **Richtwerte:**
 | SMI | Bewertung |
 |-----|-----------|
 | > 0,95 | Reif, stabil |
 | 0,85–0,95 | Akzeptabel |
-| < 0,85 | Unreif, viele Änderungen |
+| < 0,85 | Viele Änderungen – in aktiver Entwicklung normal |
 
 **Berechnung am DualNet-Beispiel (Woche 16 → Woche 17):**
 
-In der letzten Sprint-Phase wurden im Backend folgende Änderungen vorgenommen:
-- `Mt` = 30 Java-Source-Dateien (Hauptquellcode)
-- `Fc` = 3 Dateien geändert (pom.xml, CI-Konfiguration, application-test.properties)
-- `Fa` = 7 neue Testdateien (AuthControllerTest, PostControllerTest, etc.)
-- `Fd` = 0 Dateien gelöscht
+- `Mt` = 30 Java-Dateien (Hauptquellcode)
+- `Fc` = 3 geänderte Dateien (pom.xml, CI-Workflow, application-test.properties)
+- `Fa` = 7 neue Testdateien (AuthControllerTest, PostControllerTest, JwtUtilTest, …)
+- `Fd` = 0 gelöschte Dateien
 
 ```
-SMI = (30 - 3 - 7 - 0) / 30 = 20/30 ≈ 0,67
+SMI_gesamt  = (30 − 3 − 7 − 0) / 30 = 20/30 ≈ 0,67
+SMI_prod    = (30 − 3 − 0 − 0) / 30 = 27/30 = 0,90  ← nur Produktivcode
 ```
 
-Dieser Wert erscheint niedrig, ist aber im Kontext erklärbar: Die vielen neu hinzugefügten Testdateien senken den SMI rechnerisch, obwohl sie die Softwarequalität verbessern. Das zeigt eine bekannte Schwäche des SMI – er unterscheidet nicht zwischen produktivem und Test-Code. Für den Produktivcode allein (ohne Tests) wäre:
+Der niedrige Gesamt-SMI von 0,67 ist erklärbar: Die 7 neuen Testdateien verbessern die Qualität, senken aber rechnerisch den SMI – eine bekannte Schwäche der Metrik, da sie nicht zwischen Produktiv- und Testcode unterscheidet. Für den Produktivcode allein ist der SMI mit 0,90 akzeptabel. Eine Änderung am Code ist daher nicht erforderlich.
 
-```
-SMI_prod = (30 - 3 - 0 - 0) / 30 = 27/30 = 0,90  → akzeptabel
-```
-
-**Werkzeug:** Git-Befehle (`git diff --name-status`) in der CI/CD-Pipeline (siehe 1b)
+**Werkzeug:** Git-Befehle (`git diff --name-status`) – automatisch in der CI/CD-Pipeline
 
 ---
 
 ## Aufgabe 1b – CI/CD-Konfiguration für Metriken
 
-Alle drei Metriken werden automatisch in der CI/CD-Pipeline erzeugt und ausgegeben.
+Alle drei Metriken werden automatisch in der CI/CD-Pipeline erzeugt und im GitHub Actions Log ausgegeben.
 
-**Backend (GitHub Actions + Maven):**
-- Zyklomatische Komplexität → PMD-Plugin (`maven-pmd-plugin`)
-- Prozent interne Kommentare → Shell-Skript mit `grep` und `wc`
-- Software Maturity Index → Git-Befehle
+**Änderungen:**
+- `backend/pom.xml` → `maven-pmd-plugin` mit `design.xml`-Regelwerk für CC-Analyse hinzugefügt
+- `.github/workflows/backend-ci.yml` → drei neue Steps nach `mvn verify`:
+  1. **Metrik 1:** PMD-Report parsen und CC-Verletzungen ausgeben
+  2. **Metrik 2:** Kommentarzeilen mit `grep` + `wc` zählen, Prozentsatz berechnen
+  3. **Metrik 3:** SMI via `git diff --name-status` berechnen und bewerten
 
-**Ergebnis:** Die Metriken erscheinen direkt im GitHub Actions Log jedes Builds und sind somit bei jedem Push sichtbar.
-
-→ Siehe geänderte Dateien: `backend/pom.xml`, `.github/workflows/backend-ci.yml`
+Die Metriken erscheinen bei jedem Push direkt im Build-Log und sind damit für das gesamte Team sichtbar.
