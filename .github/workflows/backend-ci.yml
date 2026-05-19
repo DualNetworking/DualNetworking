@@ -26,6 +26,8 @@ jobs:
       # Schritt 1: Code aus dem Repository laden
       - name: Code laden
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # Vollständige Git-Historie für SMI-Berechnung benötigt
 
       # Schritt 2: Java 21 installieren (Temurin = OpenJDK)
       - name: Java 21 einrichten
@@ -42,15 +44,139 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      # Schritt 4: Tests ausführen (MongoDB läuft als Service-Container)
-      - name: Tests ausführen
+      # Schritt 4: Tests ausführen und Metriken erzeugen (verify läuft PMD nach den Tests)
+      - name: Tests und Metriken ausführen (mvn verify)
         working-directory: ./backend
-        run: mvn test
+        run: mvn verify
 
       # Schritt 5: Backend kompilieren und JAR bauen
       - name: Backend bauen
         working-directory: ./backend
         run: mvn package -DskipTests
+
+      # ─────────────────────────────────────────────────────────────────────────
+      # METRIK 1: Zyklomatische Komplexität (via PMD)
+      # Berechnung: CC = Anzahl Entscheidungspunkte (if/for/while/&&/||) + 1
+      # Werkzeug: maven-pmd-plugin (konfiguriert in pom.xml, Regel: design.xml)
+      # ─────────────────────────────────────────────────────────────────────────
+      - name: "Metrik 1: Zyklomatische Komplexität ausgeben (PMD)"
+        working-directory: ./backend
+        run: |
+          echo "════════════════════════════════════════════════════"
+          echo "  METRIK 1 – Zyklomatische Komplexität (PMD-Report)"
+          echo "════════════════════════════════════════════════════"
+          if [ -f target/pmd.xml ]; then
+            # Anzahl aller CyclomaticComplexity-Verletzungen zählen
+            VIOLATIONS=$(grep -c 'CyclomaticComplexity' target/pmd.xml 2>/dev/null || echo "0")
+            echo "Methoden mit erhöhter CC (> Schwellwert laut PMD): $VIOLATIONS"
+            echo ""
+            echo "Betroffene Methoden:"
+            grep -A2 'CyclomaticComplexity' target/pmd.xml \
+              | grep 'message\|beginline' \
+              | sed 's/.*message="\([^"]*\)".*/  → \1/' \
+              | grep '→' \
+              || echo "  Keine Verletzungen gefunden."
+          else
+            echo "PMD-Report nicht gefunden (target/pmd.xml fehlt)."
+          fi
+          echo ""
+
+      # ─────────────────────────────────────────────────────────────────────────
+      # METRIK 2: Prozent interne Kommentare
+      # Berechnung: Kommentaranteil = (Kommentarzeilen / Gesamtzeilen) × 100
+      # Werkzeug: Shell-Skript (grep + wc)
+      # ─────────────────────────────────────────────────────────────────────────
+      - name: "Metrik 2: Prozent interne Kommentare berechnen"
+        working-directory: ./backend
+        run: |
+          echo "════════════════════════════════════════════════════"
+          echo "  METRIK 2 – Prozent interne Kommentare"
+          echo "════════════════════════════════════════════════════"
+          # Alle Java-Dateien im Hauptquellpfad (keine Testdateien)
+          JAVA_FILES=$(find src/main/java -name "*.java")
+
+          TOTAL_LINES=0
+          COMMENT_LINES=0
+
+          for f in $JAVA_FILES; do
+            FILE_TOTAL=$(wc -l < "$f")
+            # Zeilen die mit // oder /* oder * (Javadoc) beginnen (nach Leerzeichen)
+            FILE_COMMENTS=$(grep -cE '^\s*(//|/\*|\*)' "$f" || true)
+            TOTAL_LINES=$((TOTAL_LINES + FILE_TOTAL))
+            COMMENT_LINES=$((COMMENT_LINES + FILE_COMMENTS))
+          done
+
+          echo "Gesamtzeilen (Hauptquellcode):  $TOTAL_LINES"
+          echo "Kommentarzeilen:                $COMMENT_LINES"
+
+          if [ "$TOTAL_LINES" -gt 0 ]; then
+            # Berechnung in Prozent (auf ganze Zahl gerundet)
+            PERCENT=$(( (COMMENT_LINES * 100) / TOTAL_LINES ))
+            echo "Kommentaranteil:                ${PERCENT}%"
+            echo ""
+            echo "Bewertung: Zielbereich 10–30%"
+            if [ "$PERCENT" -lt 10 ]; then
+              echo "  WARNUNG: Kommentaranteil zu gering (< 10%) – Code ggf. schwer lesbar."
+            elif [ "$PERCENT" -gt 30 ]; then
+              echo "  HINWEIS:  Kommentaranteil sehr hoch (> 30%) – Code ggf. übermäßig komplex."
+            else
+              echo "  OK: Kommentaranteil im empfohlenen Bereich."
+            fi
+          fi
+          echo ""
+
+      # ─────────────────────────────────────────────────────────────────────────
+      # METRIK 3: Software Maturity Index (SMI)
+      # Berechnung: SMI = (Mt - Fc - Fa - Fd) / Mt
+      #   Mt = Anzahl Java-Dateien im aktuellen Stand
+      #   Fc = geänderte Dateien seit letztem Commit auf main
+      #   Fa = hinzugefügte Dateien
+      #   Fd = gelöschte Dateien
+      # Werkzeug: git diff
+      # ─────────────────────────────────────────────────────────────────────────
+      - name: "Metrik 3: Software Maturity Index (SMI) berechnen"
+        working-directory: ./backend
+        run: |
+          echo "════════════════════════════════════════════════════"
+          echo "  METRIK 3 – Software Maturity Index (SMI)"
+          echo "════════════════════════════════════════════════════"
+          # Gesamtanzahl Java-Dateien im Produktivcode
+          MT=$(find src/main/java -name "*.java" | wc -l | tr -d ' ')
+
+          # Änderungen gegenüber dem vorletzten Commit auf main (HEAD~1)
+          PREV_COMMIT=$(git log --pretty=format:"%H" origin/main 2>/dev/null | sed -n '2p' || echo "HEAD~1")
+
+          FA=$(git diff --name-status "$PREV_COMMIT" HEAD -- 'backend/src/main/java/**/*.java' 2>/dev/null \
+               | grep -c '^A' || echo "0")
+          FD=$(git diff --name-status "$PREV_COMMIT" HEAD -- 'backend/src/main/java/**/*.java' 2>/dev/null \
+               | grep -c '^D' || echo "0")
+          FC=$(git diff --name-status "$PREV_COMMIT" HEAD -- 'backend/src/main/java/**/*.java' 2>/dev/null \
+               | grep -c '^M' || echo "0")
+
+          echo "Mt (Gesamtdateien Produktivcode): $MT"
+          echo "Fc (geänderte Dateien):           $FC"
+          echo "Fa (hinzugefügte Dateien):        $FA"
+          echo "Fd (gelöschte Dateien):           $FD"
+          echo ""
+
+          NUMERATOR=$((MT - FC - FA - FD))
+          if [ "$MT" -gt 0 ]; then
+            # SMI × 100 für Integer-Arithmetik, dann als Dezimal darstellen
+            SMI_100=$((NUMERATOR * 100 / MT))
+            SMI_INT=$((SMI_100 / 100))
+            SMI_FRAC=$((SMI_100 % 100))
+            echo "SMI = ($MT - $FC - $FA - $FD) / $MT = ${SMI_INT}.$(printf '%02d' $SMI_FRAC)"
+            echo ""
+            echo "Bewertung: SMI > 0.95 = reif | 0.85–0.95 = akzeptabel | < 0.85 = viele Änderungen"
+            if [ "$SMI_100" -ge 95 ]; then
+              echo "  OK: Software ist reif und stabil."
+            elif [ "$SMI_100" -ge 85 ]; then
+              echo "  OK: Akzeptabler Reifegrad."
+            else
+              echo "  HINWEIS: Viele Änderungen in diesem Release – erwartet in aktiver Entwicklung."
+            fi
+          fi
+          echo ""
 
       # Schritt 6: JAR-Datei als Artefakt speichern
       - name: JAR-Artefakt speichern

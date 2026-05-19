@@ -117,6 +117,36 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+
+            <!-- Metrik 1: PMD – misst die zyklomatische Komplexität jeder Methode -->
+            <!-- Berechnung: CC = Anzahl Entscheidungspunkte (if/for/while/&&/||) + 1 -->
+            <!-- Ausgabe: target/pmd.xml enthält alle Violations mit Severity und CC-Wert -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.23.0</version>
+                <configuration>
+                    <!-- Build bricht nicht ab; Warnungen werden nur ausgegeben -->
+                    <failOnViolation>false</failOnViolation>
+                    <printFailingErrors>true</printFailingErrors>
+                    <!-- design.xml enthält die CyclomaticComplexity-Regel -->
+                    <rulesets>
+                        <ruleset>/category/java/design.xml</ruleset>
+                    </rulesets>
+                    <sourceDirectories>
+                        <sourceDirectory>src/main/java</sourceDirectory>
+                    </sourceDirectories>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>pmd-analyse</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>pmd</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
