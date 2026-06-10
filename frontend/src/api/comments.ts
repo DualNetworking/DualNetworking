@@ -17,3 +17,7 @@ export async function addComment(postId: string, content: string): Promise<Comme
 
 
 // Löscht einen Kommentare
+export const deleteComment = async (commentId: string) => {
+  const response = await axios.delete(`/api/posts/comments/${commentId}`)
+  return response.data
+}

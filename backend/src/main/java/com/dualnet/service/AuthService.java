@@ -25,17 +25,18 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
         // Prüfen ob E-Mail oder Benutzername bereits vergeben sind
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "E-Mail ist bereits vergeben");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Upsi, das bist du ja gar nicht (E-Mail bereits vergeben)");
         }
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Benutzername ist bereits vergeben");
         }
 
-        // Neuen Nutzer erstellen und Passwort hashen (niemals Klartext speichern!)
+        // Neuen Nutzer erstellen und Passwort hashen
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        System.out.print("Neuer Benutzer angelegt.");
 
         // Nutzer in der Datenbank speichern
         User savedUser = userRepository.save(user);

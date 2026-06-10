@@ -1,0 +1,44 @@
+.deleteButton {
+    background: transparent;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    border-radius: 6px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.deleteButton img{
+    width: 20px;
+    height: 20px;
+
+    transition: transform 0.1s ease, filter 0.2s ease;
+}
+
+.deleteIcon {
+    width: 16px;
+    height: 16px;
+    background-color:  black;
+
+    transition: transform 0.1s ease, filter 0.2s ease;
+}
+
+/* 🔴 Hover Effekt */
+.deleteButton:hover {
+    background: rgba(255, 0, 0, 0.08);
+}
+
+.deleteButton:hover .deleteIcon {
+    filter: brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(7000%) hue-rotate(0deg);
+    transform: scale(1.2);
+}
+
+
+.deleteButton:active {
+    transform: scale(0.9);
+}

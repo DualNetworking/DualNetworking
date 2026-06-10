@@ -10,17 +10,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 // Verarbeitet HTTP-Anfragen für Registrierung und Login
-@RestController
-@RequestMapping("/api/auth")
+@RestController //HTTP Anfragen
+@RequestMapping("/api/auth") //Adressbezeichnung der Anfragen (können durch Rest ergänzt werden)
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthService authService; //SpringBoot initiiert new AuthService(...) selbst
 
-    // POST /api/auth/register – Neuen Nutzer registrieren
+    // POST /api/auth/register – Neuen Nutzer registrieren bei POST /api/auth/register
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        // @Valid prüft die Eingaben automatisch (z.B. E-Mail-Format, Mindestlängen)
+
         AuthResponse response = authService.register(request);
         return ResponseEntity.ok(response);
     }

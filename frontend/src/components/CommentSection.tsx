@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
-import { getComments, addComment } from '../api/comments'
+import { getComments, addComment, deleteComment } from '../api/comments'
 import { useAuth } from '../context/AuthContext'
 import type { Comment } from '../types'
+import trashIcon from "../assets/mull.png"
+import './CommentSection.css'
+
 
 interface Props {
   postId: string;
@@ -40,6 +43,21 @@ function CommentSection({ postId }: Props) {
     }
   }
 
+
+
+  //Kommentar löschen
+  const handleDelete = async (commentId: string) => {
+    try {
+      await deleteComment(commentId)
+
+      setComments(prev =>
+          prev.filter(comment => comment.id !== commentId)
+      )
+    } catch {
+      alert('Kommentar konnte nicht gelöscht werden')
+    }
+  }
+
   if (loading) return <p style={{ color: '#888', fontSize: '14px' }}>Kommentare laden...</p>
 
   return (
@@ -49,16 +67,28 @@ function CommentSection({ postId }: Props) {
         <p style={styles.empty}>Noch keine Kommentare</p>
       ) : (
         comments.map(comment => (
-          <div key={comment.id} style={styles.comment}>
-            <strong style={styles.author}>{comment.authorUsername}</strong>
-            <span style={styles.text}> {comment.content}</span>
-          </div>
+            <div key={comment.id} style={styles.comment}>
+              <strong style={styles.author}>{comment.authorUsername}</strong>
+
+              <span style={styles.text}>
+                {comment.content}
+              </span>
+
+              <button onClick={() => handleDelete(comment.id)}
+                      className="deleteButton">
+                <img
+                    src={trashIcon}
+                    alt="Löschen"
+                    style={styles.deleteIcon}
+                />
+              </button>
+            </div>
         ))
       )}
 
       {/* Eingabe für neuen Kommentar – nur für eingeloggte Nutzer */}
       {isLoggedIn && (
-        <form onSubmit={handleSubmit} style={styles.form}>
+          <form onSubmit={handleSubmit} style={styles.form}>
           <input
             type="text"
             value={newComment}
@@ -99,5 +129,6 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
   }
 }
+
 
 export default CommentSection

@@ -66,4 +66,16 @@ public class CommentService {
         User author = userRepository.findById(comment.getAuthorId()).orElse(null);
         return commentMapper.toResponse(comment, author);
     }
+
+    public void deleteComment(String commentId, String userId) {
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Kommentar nicht gefunden"));
+
+        if (!comment.getAuthorId().equals(userId)) {
+            throw new RuntimeException("Keine Berechtigung");
+        }
+
+        commentRepository.delete(comment);
+    }
 }
