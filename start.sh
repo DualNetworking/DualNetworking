@@ -50,27 +50,27 @@ echo ""
 # -------------------------------------------------------
 # Schritt 1: MongoDB starten (via Docker)
 # -------------------------------------------------------
-echo -e "${YELLOW}🗄️  Schritt 1: MongoDB starten...${NC}"
+#echo -e "${YELLOW}🗄️  Schritt 1: MongoDB starten...${NC}"
 
-cd "$SCRIPT_DIR"
+#cd "$SCRIPT_DIR"
 
 # Prüfen ob Docker läuft
-if ! docker info &> /dev/null; then
-    echo -e "${RED}❌ Docker läuft nicht. Bitte Docker Desktop starten.${NC}"
-    exit 1
-fi
+#if ! docker info &> /dev/null; then
+    #echo -e "${RED}❌ Docker läuft nicht. Bitte Docker Desktop starten.${NC}"
+    #exit 1
+#fi
 
 # MongoDB Container starten (falls noch nicht laufend)
-if docker ps | grep -q "dualnet-mongodb"; then
-    echo -e "${GREEN}✅ MongoDB läuft bereits.${NC}"
-else
-    docker-compose up -d
-    echo -e "${GREEN}✅ MongoDB gestartet (Port 27017).${NC}"
+#if docker ps | grep -q "dualnet-mongodb"; then
+    #echo -e "${GREEN}✅ MongoDB läuft bereits.${NC}"
+#else
+    #docker-compose up -d
+    #echo -e "${GREEN}✅ MongoDB gestartet (Port 27017).${NC}"
     # Kurz warten damit MongoDB hochfahren kann
-    sleep 2
-fi
+    #sleep 2
+#fi
 
-echo ""
+#echo ""
 
 # -------------------------------------------------------
 # Schritt 2: Backend starten (Spring Boot)
