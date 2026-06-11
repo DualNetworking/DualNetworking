@@ -24,3 +24,9 @@ export async function followUser(username: string): Promise<void> {
 export async function unfollowUser(username: string): Promise<void> {
   await axios.delete(`/api/users/${username}/follow`)
 }
+
+// Aktualisiert das eigene Profil (Bio und/oder Profilbild)
+export async function updateProfile(data: { bio?: string; avatarUrl?: string }): Promise<User> {
+  const response = await axios.put<User>('/api/users/me', data)
+  return response.data
+}

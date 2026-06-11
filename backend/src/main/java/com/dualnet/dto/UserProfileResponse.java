@@ -12,6 +12,7 @@ public class UserProfileResponse {
     private String id;
     private String username;
     private String bio;
+    private String avatarUrl;
     private int followersCount;
     private int followingCount;
 }

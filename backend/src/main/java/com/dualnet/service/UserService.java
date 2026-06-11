@@ -1,6 +1,7 @@
 package com.dualnet.service;
 
 import com.dualnet.dto.PostResponse;
+import com.dualnet.dto.UpdateProfileRequest;
 import com.dualnet.dto.UserProfileResponse;
 import com.dualnet.model.User;
 import com.dualnet.repository.UserRepository;
@@ -33,6 +34,13 @@ public class UserService {
     public List<PostResponse> getUserPosts(String username) {
         User user = findUserByUsernameOrThrow(username);
         return postService.getPostsByAuthor(user.getId());
+    }
+
+    public UserProfileResponse updateProfile(String currentUserId, UpdateProfileRequest request) {
+        User user = findUserByIdOrThrow(currentUserId);
+        if (request.getBio() != null) user.setBio(request.getBio());
+        if (request.getAvatarUrl() != null) user.setAvatarUrl(request.getAvatarUrl());
+        return userMapper.toProfileResponse(userRepository.save(user));
     }
 
     public void followUser(String targetUsername, String currentUserId) {

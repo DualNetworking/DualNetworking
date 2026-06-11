@@ -55,7 +55,7 @@ class PostServiceTest {
         testPost.setContent("Test-Inhalt");
 
         testResponse = new PostResponse("post-1", "Test-Inhalt", "", "author-1",
-                "testuser", 0, new ArrayList<>(), "2026-01-01T10:00:00");
+                "testuser", "", 0, new ArrayList<>(), "2026-01-01T10:00:00");
     }
 
     @Test

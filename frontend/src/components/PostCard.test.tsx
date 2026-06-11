@@ -23,6 +23,7 @@ const testPost: Post = {
   imageUrl: '',
   authorId: 'author-1',
   authorUsername: 'autornutzer',
+  authorAvatarUrl: '',
   likeCount: 3,
   likes: [],
   createdAt: '2026-01-01T10:00:00',

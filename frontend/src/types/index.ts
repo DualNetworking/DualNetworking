@@ -6,6 +6,7 @@ export interface User {
   id: string;
   username: string;
   bio: string;
+  avatarUrl: string;
   followersCount: number;
   followingCount: number;
 }
@@ -17,6 +18,7 @@ export interface Post {
   imageUrl: string;
   authorId: string;
   authorUsername: string;
+  authorAvatarUrl: string;
   likeCount: number;
   likes: string[];        // IDs der Nutzer die geliked haben
   createdAt: string;

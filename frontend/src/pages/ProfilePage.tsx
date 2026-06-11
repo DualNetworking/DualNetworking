@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
-import { getProfile, getUserPosts } from '../api/users'
+import { getProfile, getUserPosts, updateProfile } from '../api/users'
 import { useAuth } from '../context/AuthContext'
 import FollowButton from '../components/FollowButton'
 import PostCard from '../components/PostCard'
@@ -15,13 +15,22 @@ function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  // Edit-State
+  const [editing, setEditing] = useState(false)
+  const [bioInput, setBioInput] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
     if (!username) return
     setLoading(true)
+    setEditing(false)
     Promise.all([getProfile(username), getUserPosts(username)])
       .then(([profileData, postsData]) => {
         setProfile(profileData)
         setPosts(postsData)
+        setBioInput(profileData.bio || '')
       })
       .catch(() => setError('Profil konnte nicht geladen werden'))
       .finally(() => setLoading(false))
@@ -33,6 +42,44 @@ function ProfilePage() {
 
   const handlePostDelete = (postId: string) => {
     setPosts(prev => prev.filter(p => p.id !== postId))
+  }
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) {
+      setSaveError('Bild darf maximal 2 MB groß sein.')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = async () => {
+      const base64 = reader.result as string
+      setSaving(true)
+      setSaveError('')
+      try {
+        const updated = await updateProfile({ avatarUrl: base64 })
+        setProfile(updated)
+      } catch {
+        setSaveError('Bild konnte nicht gespeichert werden.')
+      } finally {
+        setSaving(false)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleSaveBio = async () => {
+    setSaving(true)
+    setSaveError('')
+    try {
+      const updated = await updateProfile({ bio: bioInput })
+      setProfile(updated)
+      setEditing(false)
+    } catch {
+      setSaveError('Bio konnte nicht gespeichert werden.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (loading) return (
@@ -53,10 +100,39 @@ function ProfilePage() {
   return (
     <div style={styles.page}>
       <div style={styles.profileCard}>
+
+        {/* Avatar */}
         <div style={styles.avatarWrap}>
-          <div style={styles.avatar}>{initial}</div>
+          {profile.avatarUrl ? (
+            <img src={profile.avatarUrl} alt="Profilbild" style={styles.avatarImg} />
+          ) : (
+            <div style={styles.avatarPlaceholder}>{initial}</div>
+          )}
+          {isOwnProfile && (
+            <>
+              <button
+                style={styles.avatarEditBtn}
+                onClick={() => fileInputRef.current?.click()}
+                title="Profilbild ändern"
+                disabled={saving}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </svg>
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleAvatarChange}
+              />
+            </>
+          )}
         </div>
 
+        {/* Profil-Info */}
         <div style={styles.profileInfo}>
           <div style={styles.profileTop}>
             <h1 style={styles.username}>{profile.username}</h1>
@@ -74,8 +150,44 @@ function ProfilePage() {
             )}
           </div>
 
-          {profile.bio && <p style={styles.bio}>{profile.bio}</p>}
+          {/* Bio */}
+          {isOwnProfile && editing ? (
+            <div style={styles.bioEditWrap}>
+              <textarea
+                value={bioInput}
+                onChange={e => setBioInput(e.target.value)}
+                maxLength={200}
+                rows={3}
+                style={styles.bioTextarea}
+                placeholder="Schreib etwas über dich..."
+                autoFocus
+              />
+              <div style={styles.bioEditActions}>
+                <span style={styles.bioCounter}>{200 - bioInput.length} Zeichen</span>
+                <button onClick={() => { setEditing(false); setBioInput(profile.bio || '') }} style={styles.cancelBtn}>Abbrechen</button>
+                <button onClick={handleSaveBio} disabled={saving} style={styles.saveBtn}>
+                  {saving ? 'Speichern...' : 'Speichern'}
+                </button>
+              </div>
+              {saveError && <p style={styles.saveError}>{saveError}</p>}
+            </div>
+          ) : (
+            <div style={styles.bioRow}>
+              <p style={styles.bio}>{profile.bio || (isOwnProfile ? 'Noch keine Bio.' : '')}</p>
+              {isOwnProfile && (
+                <button onClick={() => setEditing(true)} style={styles.bioEditInlineBtn} title="Bio bearbeiten">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          )}
 
+          {saveError && !editing && <p style={styles.saveError}>{saveError}</p>}
+
+          {/* Stats */}
           <div style={styles.stats}>
             <div style={styles.stat}>
               <span style={styles.statNum}>{posts.length}</span>
@@ -109,11 +221,7 @@ function ProfilePage() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  page: {
-    maxWidth: '640px',
-    margin: '0 auto',
-    padding: '28px 16px',
-  },
+  page: { maxWidth: '640px', margin: '0 auto', padding: '28px 16px' },
   profileCard: {
     backgroundColor: 'white',
     borderRadius: '12px',
@@ -126,11 +234,20 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'flex-start',
   },
   avatarWrap: {
+    position: 'relative',
     flexShrink: 0,
+  } as React.CSSProperties,
+  avatarImg: {
+    width: '76px',
+    height: '76px',
+    borderRadius: '50%',
+    objectFit: 'cover',
+    border: '2px solid #fecaca',
+    display: 'block',
   },
-  avatar: {
-    width: '72px',
-    height: '72px',
+  avatarPlaceholder: {
+    width: '76px',
+    height: '76px',
     borderRadius: '50%',
     backgroundColor: '#fdf0f0',
     color: '#d64045',
@@ -141,10 +258,23 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: '700',
     border: '2px solid #fecaca',
   } as React.CSSProperties,
-  profileInfo: {
-    flex: 1,
-    minWidth: 0,
-  },
+  avatarEditBtn: {
+    position: 'absolute',
+    bottom: '0',
+    right: '0',
+    width: '24px',
+    height: '24px',
+    borderRadius: '50%',
+    backgroundColor: '#1f2937',
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 0,
+  } as React.CSSProperties,
+  profileInfo: { flex: 1, minWidth: 0 },
   profileTop: {
     display: 'flex',
     alignItems: 'center',
@@ -159,11 +289,78 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#111827',
     letterSpacing: '-0.3px',
   },
+  bioRow: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '6px',
+    marginBottom: '14px',
+  },
   bio: {
     fontSize: '14px',
     color: '#6b7280',
-    marginBottom: '14px',
     lineHeight: '1.5',
+    margin: 0,
+    flex: 1,
+  },
+  bioEditInlineBtn: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    color: '#9ca3af',
+    padding: '2px',
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+  },
+  bioEditWrap: {
+    marginBottom: '14px',
+  },
+  bioTextarea: {
+    width: '100%',
+    padding: '8px 12px',
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontFamily: 'inherit',
+    color: '#111827',
+    backgroundColor: '#fafafa',
+    outline: 'none',
+    resize: 'none',
+    lineHeight: '1.5',
+    boxSizing: 'border-box',
+  } as React.CSSProperties,
+  bioEditActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginTop: '6px',
+  },
+  bioCounter: { fontSize: '12px', color: '#9ca3af', marginRight: 'auto' },
+  cancelBtn: {
+    padding: '5px 12px',
+    background: 'transparent',
+    border: '1px solid #e5e7eb',
+    borderRadius: '6px',
+    fontSize: '13px',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    color: '#6b7280',
+  },
+  saveBtn: {
+    padding: '5px 14px',
+    backgroundColor: '#d64045',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+  },
+  saveError: {
+    fontSize: '13px',
+    color: '#b91c1c',
+    marginTop: '6px',
   },
   stats: {
     display: 'flex',
@@ -183,16 +380,8 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#111827',
     lineHeight: 1,
   },
-  statLabel: {
-    fontSize: '12px',
-    color: '#9ca3af',
-    lineHeight: 1,
-  },
-  statDivider: {
-    width: '1px',
-    height: '28px',
-    backgroundColor: '#e5e7eb',
-  },
+  statLabel: { fontSize: '12px', color: '#9ca3af', lineHeight: 1 },
+  statDivider: { width: '1px', height: '28px', backgroundColor: '#e5e7eb' },
   postsHeading: {
     fontSize: '16px',
     fontWeight: '600',

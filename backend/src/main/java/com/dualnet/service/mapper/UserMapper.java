@@ -14,6 +14,7 @@ public class UserMapper {
                 user.getId(),
                 user.getUsername(),
                 user.getBio() != null ? user.getBio() : "",
+                user.getAvatarUrl() != null ? user.getAvatarUrl() : "",
                 user.getFollowers().size(),
                 user.getFollowing().size()
         );

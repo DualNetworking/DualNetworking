@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.List;
 
 // Geschäftslogik für Posts: erstellen, laden, liken.
@@ -64,6 +65,20 @@ public class PostService {
         post.getLikes().remove(currentUserId);
         Post savedPost = postRepository.save(post);
         return toResponseWithAuthor(savedPost);
+    }
+
+    // Liefert Posts aller Nutzer denen currentUser folgt (für Following-Feed)
+    public List<PostResponse> getFollowingFeed(String currentUserId) {
+        return userRepository.findById(currentUserId)
+                .map(user -> {
+                    List<String> following = user.getFollowing();
+                    if (following.isEmpty()) return Collections.<PostResponse>emptyList();
+                    return postRepository.findByAuthorIdInOrderByCreatedAtDesc(following)
+                            .stream()
+                            .map(this::toResponseWithAuthor)
+                            .toList();
+                })
+                .orElse(Collections.emptyList());
     }
 
     // Liefert alle Posts eines bestimmten Autors (für Profilseite).

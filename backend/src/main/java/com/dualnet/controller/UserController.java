@@ -1,9 +1,11 @@
 package com.dualnet.controller;
 
 import com.dualnet.dto.PostResponse;
+import com.dualnet.dto.UpdateProfileRequest;
 import com.dualnet.dto.UserProfileResponse;
 import com.dualnet.model.User;
 import com.dualnet.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,6 +32,14 @@ public class UserController {
     @GetMapping("/{username}/posts")
     public ResponseEntity<List<PostResponse>> getUserPosts(@PathVariable String username) {
         return ResponseEntity.ok(userService.getUserPosts(username));
+    }
+
+    // PUT /api/users/me – Eigenes Profil aktualisieren (Bio + Profilbild)
+    @PutMapping("/me")
+    public ResponseEntity<UserProfileResponse> updateProfile(
+            @Valid @RequestBody UpdateProfileRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(userService.updateProfile(currentUser.getId(), request));
     }
 
     // POST /api/users/{username}/follow – Einem Nutzer folgen (JWT nötig)

@@ -27,6 +27,13 @@ public class PostController {
         return ResponseEntity.ok(postService.getFeed());
     }
 
+    // GET /api/posts/following – Posts der gefolgten Nutzer (JWT nötig)
+    @GetMapping("/following")
+    public ResponseEntity<List<PostResponse>> getFollowingFeed(
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(postService.getFollowingFeed(currentUser.getId()));
+    }
+
     // POST /api/posts – Neuen Post erstellen (JWT nötig)
     @PostMapping
     public ResponseEntity<PostResponse> createPost(

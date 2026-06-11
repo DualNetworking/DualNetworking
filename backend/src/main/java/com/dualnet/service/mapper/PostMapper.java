@@ -21,6 +21,7 @@ public class PostMapper {
                 post.getImageUrl() != null ? post.getImageUrl() : "",
                 post.getAuthorId(),
                 resolveAuthorUsername(author),
+                resolveAuthorAvatarUrl(author),
                 post.getLikes().size(),
                 post.getLikes(),
                 post.getCreatedAt().toString()
@@ -29,5 +30,9 @@ public class PostMapper {
 
     private String resolveAuthorUsername(User author) {
         return author != null ? author.getUsername() : UNKNOWN_AUTHOR;
+    }
+
+    private String resolveAuthorAvatarUrl(User author) {
+        return author != null && author.getAvatarUrl() != null ? author.getAvatarUrl() : "";
     }
 }

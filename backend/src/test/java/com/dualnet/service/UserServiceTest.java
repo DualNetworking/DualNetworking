@@ -49,7 +49,7 @@ class UserServiceTest {
 
     @Test
     void getProfile_gibtUserProfileResponseZurueck() {
-        UserProfileResponse expected = new UserProfileResponse("target-id", "zielnutzer", "", 0, 0);
+        UserProfileResponse expected = new UserProfileResponse("target-id", "zielnutzer", "", "", 0, 0);
         when(userRepository.findByUsername("zielnutzer")).thenReturn(Optional.of(targetUser));
         when(userMapper.toProfileResponse(targetUser)).thenReturn(expected);
 

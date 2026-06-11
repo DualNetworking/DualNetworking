@@ -1,14 +1,26 @@
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getProfile } from '../api/users'
 
 function Navbar() {
   const { username, logout } = useAuth()
   const navigate = useNavigate()
+  const [avatarUrl, setAvatarUrl] = useState<string>('')
+
+  useEffect(() => {
+    if (!username) return
+    getProfile(username)
+      .then(p => setAvatarUrl(p.avatarUrl || ''))
+      .catch(() => {})
+  }, [username])
 
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
+
+  const initial = username?.[0]?.toUpperCase()
 
   return (
     <nav style={styles.nav}>
@@ -19,7 +31,11 @@ function Navbar() {
           <span style={styles.plus}>+</span> Post
         </Link>
         <Link to={`/profile/${username}`} style={styles.profileLink}>
-          <span style={styles.avatar}>{username?.[0]?.toUpperCase()}</span>
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="Profilbild" style={styles.avatarImg} />
+          ) : (
+            <span style={styles.avatarFallback}>{initial}</span>
+          )}
           {username}
         </Link>
         <button onClick={handleLogout} style={styles.logoutBtn}>Ausloggen</button>
@@ -64,7 +80,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     fontWeight: '500',
     backgroundColor: '#f3f4f6',
-    transition: 'background 0.15s',
   },
   plus: {
     fontSize: '16px',
@@ -80,9 +95,16 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '8px',
     fontSize: '14px',
     fontWeight: '500',
-    transition: 'background 0.15s',
   },
-  avatar: {
+  avatarImg: {
+    width: '28px',
+    height: '28px',
+    borderRadius: '50%',
+    objectFit: 'cover',
+    flexShrink: 0,
+    border: '1.5px solid #fecaca',
+  } as React.CSSProperties,
+  avatarFallback: {
     width: '28px',
     height: '28px',
     borderRadius: '50%',
@@ -104,7 +126,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     fontWeight: '500',
     cursor: 'pointer',
-    transition: 'all 0.15s',
   },
 }
 

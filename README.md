@@ -2,7 +2,7 @@
 
 Eine Social-Media-Plattform als Hochschulprojekt (TINF24B4, DHBW Karlsruhe).
 
-**Features:** Registrierung & Login · Posts erstellen · Feed anzeigen · Profil & Follower · Likes & Kommentare
+**Features:** Registrierung & Login · Posts erstellen · Feed anzeigen · Profil & Follower · Likes & Kommentare · Antworten auf Kommentare · Profilbild & Bio · Für-dich / Gefolgte / Eigene Beiträge Feed-Tabs
 
 ---
 
@@ -84,16 +84,16 @@ DualNetworking/
 │   └── src/
 │       ├── pages/           ← Login, Register, Feed, Profile, CreatePost
 │       ├── components/      ← Navbar, PostCard, CommentSection, FollowButton
-│       ├── api/             ← HTTP-Aufrufe (auth, posts, users, comments)
+│       ├── api/             ← HTTP-Aufrufe (auth, posts, users, comments, replies)
 │       ├── context/         ← AuthContext (JWT-Zustand)
 │       └── types/           ← TypeScript-Typdefinitionen
 │
 ├── backend/                 ← Java 21 + Spring Boot 3
 │   └── src/main/java/com/dualnet/
-│       ├── controller/      ← HTTP-Endpunkte (Auth, Post, User, Comment)
+│       ├── controller/      ← HTTP-Endpunkte (Auth, Post, User, Comment, Reply)
 │       ├── service/         ← Geschäftslogik
 │       ├── repository/      ← MongoDB-Abfragen (Spring Data)
-│       ├── model/           ← Datenmodelle (User, Post, Comment)
+│       ├── model/           ← Datenmodelle (User, Post, Comment, Reply)
 │       ├── security/        ← JWT (JwtUtil, JwtFilter)
 │       ├── config/          ← Spring Security, CORS
 │       └── dto/             ← Request/Response-Objekte
@@ -117,17 +117,28 @@ DualNetworking/
 | Method | Endpunkt | Auth | Beschreibung |
 |--------|----------|------|--------------|
 | GET | `/api/posts` | – | Feed laden (alle Posts) |
+| GET | `/api/posts/following` | JWT | Feed der gefolgten Nutzer |
 | POST | `/api/posts` | JWT | Post erstellen |
+| DELETE | `/api/posts/{id}` | JWT | Eigenen Post löschen |
 | POST | `/api/posts/{id}/like` | JWT | Post liken |
 | DELETE | `/api/posts/{id}/like` | JWT | Like entfernen |
-| GET | `/api/posts/{id}/comments` | – | Kommentare laden |
-| POST | `/api/posts/{id}/comments` | JWT | Kommentar schreiben |
+
+### Kommentare & Antworten
+| Method | Endpunkt | Auth | Beschreibung |
+|--------|----------|------|--------------|
+| GET | `/api/posts/{postId}/comments` | – | Kommentare eines Posts laden |
+| POST | `/api/posts/{postId}/comments` | JWT | Kommentar schreiben |
+| DELETE | `/api/comments/{id}` | JWT | Eigenen Kommentar löschen |
+| GET | `/api/comments/{id}/replies` | – | Antworten auf Kommentar laden |
+| POST | `/api/comments/{id}/replies` | JWT | Auf Kommentar antworten |
+| DELETE | `/api/comments/replies/{id}` | JWT | Eigene Antwort löschen |
 
 ### Nutzer
 | Method | Endpunkt | Auth | Beschreibung |
 |--------|----------|------|--------------|
 | GET | `/api/users/{username}` | – | Profil anzeigen |
 | GET | `/api/users/{username}/posts` | – | Posts eines Nutzers |
+| PUT | `/api/users/me` | JWT | Eigenes Profil aktualisieren (Bio, Profilbild) |
 | POST | `/api/users/{username}/follow` | JWT | Folgen |
 | DELETE | `/api/users/{username}/follow` | JWT | Entfolgen |
 

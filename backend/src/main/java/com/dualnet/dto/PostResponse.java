@@ -16,6 +16,7 @@ public class PostResponse {
     private String imageUrl;
     private String authorId;
     private String authorUsername;
+    private String authorAvatarUrl;
     private int likeCount;
     private List<String> likes;
     private String createdAt;

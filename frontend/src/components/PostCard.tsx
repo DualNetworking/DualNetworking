@@ -45,13 +45,17 @@ function PostCard({ post, onUpdate, onDelete }: Props) {
     }
   }
 
-  const initials = post.authorUsername[0]?.toUpperCase()
+  const initial = post.authorUsername[0]?.toUpperCase()
 
   return (
     <article style={{ ...styles.card, opacity: deleting ? 0.5 : 1 }}>
       <div style={styles.header}>
         <Link to={`/profile/${post.authorUsername}`} style={styles.authorRow}>
-          <span style={styles.authorAvatar}>{initials}</span>
+          {post.authorAvatarUrl ? (
+            <img src={post.authorAvatarUrl} alt="" style={styles.authorAvatarImg} />
+          ) : (
+            <span style={styles.authorAvatar}>{initial}</span>
+          )}
           <span style={styles.authorName}>{post.authorUsername}</span>
         </Link>
         <div style={styles.headerRight}>
@@ -133,6 +137,14 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     color: 'inherit',
   },
+  authorAvatarImg: {
+    width: '34px',
+    height: '34px',
+    borderRadius: '50%',
+    objectFit: 'cover',
+    flexShrink: 0,
+    border: '1.5px solid #fecaca',
+  } as React.CSSProperties,
   authorAvatar: {
     width: '34px',
     height: '34px',

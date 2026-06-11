@@ -13,4 +13,7 @@ public interface PostRepository extends MongoRepository<Post, String> {
 
     // Lädt alle Posts eines bestimmten Nutzers (neueste zuerst) → für Profilseite
     List<Post> findByAuthorIdOrderByCreatedAtDesc(String authorId);
+
+    // Lädt Posts aller gefolgten Nutzer (neueste zuerst) → für Following-Feed
+    List<Post> findByAuthorIdInOrderByCreatedAtDesc(List<String> authorIds);
 }

@@ -31,3 +31,9 @@ export async function unlikePost(postId: string): Promise<Post> {
 export async function deletePost(postId: string): Promise<void> {
   await axios.delete(`/api/posts/${postId}`)
 }
+
+// Lädt Posts der gefolgten Nutzer
+export async function getFollowingFeed(): Promise<Post[]> {
+  const response = await axios.get<Post[]>('/api/posts/following')
+  return response.data
+}

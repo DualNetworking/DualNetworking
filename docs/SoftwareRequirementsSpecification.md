@@ -44,6 +44,12 @@ Siehe: [docs/uml/use-case-diagram.png](uml/use-case-diagram.png)
 | US-06 | Nutzer | einen Post liken können | ich Zustimmung zeigen kann | Mittel |
 | US-07 | Nutzer | einen Kommentar schreiben können | ich auf Posts reagieren kann | Mittel |
 | US-08 | Nutzer | ein Nutzerprofil anzeigen können | ich mehr über andere Nutzer erfahren kann | Mittel |
+| US-09 | Nutzer | ein Profilbild hochladen können | mein Profil persönlicher wirkt | Mittel |
+| US-10 | Nutzer | eine Kurzbio auf meinem Profil hinterlegen können | andere Nutzer mich besser kennenlernen können | Mittel |
+| US-11 | Nutzer | auf Kommentare anderer Nutzer antworten können | ich Diskussionen führen kann | Mittel |
+| US-12 | Nutzer | einen Feed nur mit Beiträgen von gefolgten Nutzern sehen können | ich relevante Inhalte schneller finde | Mittel |
+| US-13 | Nutzer | meine eigenen Beiträge löschen können | ich unerwünschte Posts entfernen kann | Mittel |
+| US-14 | Nutzer | meine eigenen Beiträge in einem separaten Tab sehen können | ich einen Überblick über meine Aktivität behalte | Niedrig |
 
 ### 2.3 Use Cases (Detailbeschreibung)
 

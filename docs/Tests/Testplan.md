@@ -71,8 +71,8 @@ DualNetworking ist eine Social-Media-Webanwendung bestehend aus einem React/Type
 | IT-02 | `/api/auth/register` | POST | Registrierung mit doppeltem Username | HTTP 400/409 |
 | IT-03 | `/api/auth/login` | POST | Login mit korrekten Daten | HTTP 200, JWT-Token |
 | IT-04 | `/api/auth/login` | POST | Login mit falschem Passwort | HTTP 401 |
-| IT-05 | `/api/posts` | GET | Feed laden ohne Token | HTTP 403 |
-| IT-06 | `/api/posts` | GET | Feed laden mit gültigem Token | HTTP 200, Liste |
+| IT-05 | `/api/posts` | GET | Feed laden ohne Token | HTTP 200, Liste (öffentlicher Endpunkt) |
+| IT-06 | `/api/posts/following` | GET | Following-Feed ohne Token | HTTP 401/403 |
 | IT-07 | `/api/posts` | POST | Post erstellen mit Token | HTTP 200/201, Post im Response |
 | IT-08 | `/api/posts/{id}/like` | POST | Like hinzufügen | HTTP 200, Like-Count erhöht |
 | IT-09 | `/api/comments/{postId}` | POST | Kommentar erstellen | HTTP 200, Kommentar im Response |
@@ -98,6 +98,12 @@ DualNetworking ist eine Social-Media-Webanwendung bestehend aus einem React/Type
 | SM-08 | Follow-Button klicken | Status wechselt zu "Unfollow" |
 | SM-09 | Logout | Weiterleitung zur Login-Seite |
 | SM-10 | Direktaufruf geschützter Route ohne Login | Weiterleitung zur Login-Seite |
+| SM-11 | Profilbild hochladen | Bild erscheint auf Profil, Navbar und Beiträgen |
+| SM-12 | Bio bearbeiten und speichern | Bio erscheint auf Profilseite |
+| SM-13 | Tab "Gefolgte" öffnen | Nur Posts von gefolgten Nutzern sichtbar |
+| SM-14 | Tab "Meine Beiträge" öffnen | Nur eigene Posts sichtbar |
+| SM-15 | Eigenen Post löschen | Post verschwindet aus allen Feed-Tabs |
+| SM-16 | Auf Kommentar antworten | Antwort erscheint unter dem Kommentar |
 
 ---
 
@@ -188,7 +194,7 @@ Alle Testfälle werden in dieser Datei mit Status gepflegt:
 | IT-07 | Bestanden | `controller/PostControllerTest.java` |
 | IT-08 | Bestanden | `controller/PostControllerTest.java` |
 | IT-09 bis IT-11 | Geplant | – |
-| SM-01 bis SM-10 | Geplant | – |
+| SM-01 bis SM-16 | Geplant | – |
 | SEC-01 bis SEC-05 | Geplant | – |
 
 ### 5.3 Rückverfolgbarkeit zu User Stories
@@ -203,6 +209,12 @@ Alle Testfälle werden in dieser Datei mit Status gepflegt:
 | US-06: Likes | UT-BE-08, IT-08, SM-06, UT-FE-04 |
 | US-07: Profil | UT-BE-11, IT-10, SM-07 |
 | US-08: Follow/Unfollow | UT-BE-12, UT-BE-13, IT-11, SM-08 |
+| US-09: Profilbild | SM-11 |
+| US-10: Bio | SM-12 |
+| US-11: Antworten auf Kommentare | SM-16 |
+| US-12: Following-Feed | IT-06, SM-13 |
+| US-13: Post löschen | SM-15 |
+| US-14: Meine Beiträge Tab | SM-14 |
 
 ---
 

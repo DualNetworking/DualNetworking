@@ -10,9 +10,12 @@
 ### 1.1 Anforderungsübersicht
 
 DualNet ist eine Social-Media-Plattform, auf der Nutzer:
-- Beiträge (Posts) veröffentlichen können
+- Beiträge (Posts) veröffentlichen und eigene Posts löschen können
 - Anderen Nutzern folgen können
 - Posts liken und kommentieren können
+- Auf Kommentare antworten können
+- Ein Profilbild (Base64) hochladen und eine Bio hinterlegen können
+- Den Feed nach "Für dich", "Gefolgte" oder "Meine Beiträge" filtern können
 
 Vollständige Anforderungen: [../SoftwareRequirementsSpecification.md](../SoftwareRequirementsSpecification.md)
 
@@ -111,12 +114,14 @@ Vollständige Anforderungen: [../SoftwareRequirementsSpecification.md](../Softwa
 
 | Baustein | Beschreibung |
 |----------|--------------|
-| `controller/` | Nimmt HTTP-Anfragen entgegen, gibt Antworten zurück |
-| `service/` | Geschäftslogik (z.B. Passwort hashen, Post erstellen) |
+| `controller/` | Nimmt HTTP-Anfragen entgegen, gibt Antworten zurück (Auth, Post, User, Comment, Reply) |
+| `service/` | Geschäftslogik (z.B. Passwort hashen, Post erstellen, Profilbild speichern) |
+| `service/mapper/` | Entity → DTO-Konvertierung (PostMapper, UserMapper, CommentMapper) |
 | `repository/` | Datenbankzugriff via Spring Data MongoDB |
-| `model/` | Datenmodelle (User, Post, Comment) |
+| `model/` | Datenmodelle (User, Post, Comment, Reply) |
+| `dto/` | Request/Response-Objekte (PostResponse, UserProfileResponse, ReplyResponse, …) |
 | `security/` | JWT-Filter und Hilfsfunktionen |
-| `config/` | Spring Security und JWT-Konfiguration |
+| `config/` | Spring Security und CORS-Konfiguration |
 
 ---
 

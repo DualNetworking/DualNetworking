@@ -34,6 +34,9 @@ public class User {
     // Kurze Beschreibung des Nutzers (optional)
     private String bio = "";
 
+    // Profilbild als Base64-kodierter Data-URL (optional)
+    private String avatarUrl = "";
+
     // Liste der IDs von Nutzern, denen dieser Nutzer folgt
     private List<String> following = new ArrayList<>();
 
