@@ -26,3 +26,8 @@ export async function unlikePost(postId: string): Promise<Post> {
   const response = await axios.delete<Post>(`/api/posts/${postId}/like`)
   return response.data
 }
+
+// Löscht einen eigenen Post
+export async function deletePost(postId: string): Promise<void> {
+  await axios.delete(`/api/posts/${postId}`)
+}

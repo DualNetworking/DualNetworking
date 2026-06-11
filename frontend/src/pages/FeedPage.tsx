@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { getFeed } from '../api/posts'
 import PostCard from '../components/PostCard'
 import type { Post } from '../types'
 
-// Feed-Seite: Zeigt alle Posts chronologisch an
 function FeedPage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  // Posts beim Laden der Seite abrufen
   useEffect(() => {
     getFeed()
       .then(setPosts)
@@ -17,28 +16,43 @@ function FeedPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Post in der Liste aktualisieren (z.B. nach einem Like)
   const handlePostUpdate = (updatedPost: Post) => {
     setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p))
   }
 
-  if (loading) return <div style={styles.message}>Feed wird geladen...</div>
-  if (error) return <div style={styles.error}>{error}</div>
+  const handlePostDelete = (postId: string) => {
+    setPosts(prev => prev.filter(p => p.id !== postId))
+  }
+
+  if (loading) return (
+    <div style={styles.page}>
+      <div style={styles.skeleton}>
+        {[1, 2, 3].map(i => <div key={i} style={styles.skeletonCard} />)}
+      </div>
+    </div>
+  )
+
+  if (error) return (
+    <div style={styles.page}>
+      <div style={styles.errorBox}>{error}</div>
+    </div>
+  )
 
   return (
     <div style={styles.page}>
-      <h2 style={styles.heading}>Feed</h2>
+      <div style={styles.header}>
+        <h1 style={styles.heading}>Feed</h1>
+        <span style={styles.count}>{posts.length} {posts.length === 1 ? 'Beitrag' : 'Beiträge'}</span>
+      </div>
 
-      {/* Hinweis wenn noch keine Posts vorhanden sind */}
       {posts.length === 0 ? (
         <div style={styles.empty}>
-          <p>Noch keine Posts vorhanden.</p>
-          <p>Sei der Erste und <a href="/create">erstelle einen Post!</a></p>
+          <p style={styles.emptyTitle}>Noch nichts hier</p>
+          <p style={styles.emptyText}>Sei der Erste und <Link to="/create">erstelle einen Post!</Link></p>
         </div>
       ) : (
-        // Liste aller Posts
         posts.map(post => (
-          <PostCard key={post.id} post={post} onUpdate={handlePostUpdate} />
+          <PostCard key={post.id} post={post} onUpdate={handlePostUpdate} onDelete={handlePostDelete} />
         ))
       )}
     </div>
@@ -47,32 +61,63 @@ function FeedPage() {
 
 const styles: Record<string, React.CSSProperties> = {
   page: {
-    maxWidth: '680px',
+    maxWidth: '640px',
     margin: '0 auto',
-    padding: '24px 16px',
+    padding: '28px 16px',
   },
-  heading: {
-    color: '#1a1a2e',
+  header: {
+    display: 'flex',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
     marginBottom: '20px',
   },
-  message: {
-    textAlign: 'center',
-    padding: '40px',
-    color: '#666',
+  heading: {
+    fontSize: '22px',
+    fontWeight: '700',
+    color: '#111827',
+    letterSpacing: '-0.4px',
   },
-  error: {
-    textAlign: 'center',
-    padding: '40px',
-    color: '#c62828',
+  count: {
+    fontSize: '13px',
+    color: '#9ca3af',
+  },
+  skeleton: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    marginTop: '12px',
+  },
+  skeletonCard: {
+    height: '120px',
+    backgroundColor: '#f3f4f6',
+    borderRadius: '10px',
+    animation: 'pulse 1.5s ease-in-out infinite',
+  },
+  errorBox: {
+    padding: '16px',
+    backgroundColor: '#fdf0f0',
+    color: '#b91c1c',
+    borderRadius: '10px',
+    fontSize: '14px',
+    border: '1px solid #fecaca',
   },
   empty: {
     textAlign: 'center',
-    padding: '40px',
-    color: '#666',
+    padding: '48px 24px',
     backgroundColor: 'white',
-    borderRadius: '12px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-  }
+    borderRadius: '10px',
+    border: '1px solid #e5e7eb',
+  },
+  emptyTitle: {
+    fontSize: '16px',
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: '6px',
+  },
+  emptyText: {
+    fontSize: '14px',
+    color: '#9ca3af',
+  },
 }
 
 export default FeedPage

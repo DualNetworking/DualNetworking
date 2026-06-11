@@ -49,6 +49,15 @@ public class PostService {
         return toResponseWithAuthor(savedPost);
     }
 
+    // Löscht einen Post (nur der Autor darf das)
+    public void deletePost(String postId, String currentUserId) {
+        Post post = findPostOrThrow(postId);
+        if (!post.getAuthorId().equals(currentUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Keine Berechtigung");
+        }
+        postRepository.delete(post);
+    }
+
     // Entfernt einen Like (idempotent)
     public PostResponse unlikePost(String postId, String currentUserId) {
         Post post = findPostOrThrow(postId);

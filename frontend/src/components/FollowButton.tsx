@@ -3,18 +3,16 @@ import { followUser, unfollowUser } from '../api/users'
 import { useAuth } from '../context/AuthContext'
 
 interface Props {
-  username: string;           // Benutzername des Zielprofils
-  initiallyFollowing: boolean; // Folgt der aktuelle Nutzer bereits?
-  onFollowChange?: (nowFollowing: boolean) => void; // Callback nach Änderung
+  username: string;
+  initiallyFollowing: boolean;
+  onFollowChange?: (nowFollowing: boolean) => void;
 }
 
-// Schaltfläche zum Folgen oder Entfolgen eines Nutzers
 function FollowButton({ username, initiallyFollowing, onFollowChange }: Props) {
   const { username: currentUsername } = useAuth()
   const [following, setFollowing] = useState(initiallyFollowing)
   const [loading, setLoading] = useState(false)
 
-  // Nicht anzeigen für das eigene Profil
   if (username === currentUsername) return null
 
   const handleClick = async () => {
@@ -41,16 +39,18 @@ function FollowButton({ username, initiallyFollowing, onFollowChange }: Props) {
       onClick={handleClick}
       disabled={loading}
       style={{
-        padding: '8px 20px',
-        backgroundColor: following ? 'white' : '#e94560',
-        color: following ? '#e94560' : 'white',
-        border: '2px solid #e94560',
+        padding: '7px 18px',
+        backgroundColor: following ? 'white' : '#d64045',
+        color: following ? '#d64045' : 'white',
+        border: '1.5px solid #d64045',
         borderRadius: '8px',
         cursor: 'pointer',
-        fontWeight: 'bold',
+        fontWeight: '600',
+        fontSize: '13px',
+        transition: 'all 0.15s',
+        fontFamily: 'inherit',
       }}
     >
-      {/* Text je nach aktuellem Follow-Status */}
       {loading ? '...' : following ? 'Entfolgen' : 'Folgen'}
     </button>
   )

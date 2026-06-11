@@ -1,12 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-// Navigationsleiste – wird auf allen Seiten nach dem Login angezeigt
 function Navbar() {
   const { username, logout } = useAuth()
   const navigate = useNavigate()
 
-  // Ausloggen und zur Login-Seite weiterleiten
   const handleLogout = () => {
     logout()
     navigate('/login')
@@ -14,59 +12,100 @@ function Navbar() {
 
   return (
     <nav style={styles.nav}>
-      {/* App-Logo/Name links – klickbar zurück zum Feed */}
       <Link to="/" style={styles.logo}>DualNet</Link>
 
       <div style={styles.links}>
-        {/* Link zur Post-Erstellen-Seite */}
-        <Link to="/create" style={styles.link}>+ Post</Link>
-
-        {/* Link zum eigenen Profil */}
-        <Link to={`/profile/${username}`} style={styles.link}>{username}</Link>
-
-        {/* Ausloggen-Schaltfläche */}
-        <button onClick={handleLogout} style={styles.button}>Ausloggen</button>
+        <Link to="/create" style={styles.createLink}>
+          <span style={styles.plus}>+</span> Post
+        </Link>
+        <Link to={`/profile/${username}`} style={styles.profileLink}>
+          <span style={styles.avatar}>{username?.[0]?.toUpperCase()}</span>
+          {username}
+        </Link>
+        <button onClick={handleLogout} style={styles.logoutBtn}>Ausloggen</button>
       </div>
     </nav>
   )
 }
 
-// Einfache inline-Styles für die Navbar
 const styles: Record<string, React.CSSProperties> = {
   nav: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '12px 24px',
-    backgroundColor: '#1a1a2e',
-    color: 'white',
+    padding: '0 32px',
+    height: '56px',
+    backgroundColor: '#ffffff',
+    borderBottom: '1px solid #e5e7eb',
     position: 'sticky',
     top: 0,
     zIndex: 100,
   },
   logo: {
-    color: '#e94560',
+    color: '#d64045',
     textDecoration: 'none',
-    fontSize: '22px',
-    fontWeight: 'bold',
+    fontSize: '20px',
+    fontWeight: '700',
+    letterSpacing: '-0.5px',
   },
   links: {
     display: 'flex',
-    gap: '20px',
+    gap: '8px',
     alignItems: 'center',
   },
-  link: {
-    color: 'white',
+  createLink: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    color: '#1f2937',
     textDecoration: 'none',
-  },
-  button: {
-    backgroundColor: 'transparent',
-    color: '#e94560',
-    border: '1px solid #e94560',
     padding: '6px 14px',
-    borderRadius: '6px',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: '500',
+    backgroundColor: '#f3f4f6',
+    transition: 'background 0.15s',
+  },
+  plus: {
+    fontSize: '16px',
+    lineHeight: 1,
+  },
+  profileLink: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    color: '#1f2937',
+    textDecoration: 'none',
+    padding: '4px 10px',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: '500',
+    transition: 'background 0.15s',
+  },
+  avatar: {
+    width: '28px',
+    height: '28px',
+    borderRadius: '50%',
+    backgroundColor: '#d64045',
+    color: 'white',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '12px',
+    fontWeight: '600',
+    flexShrink: 0,
+  } as React.CSSProperties,
+  logoutBtn: {
+    backgroundColor: 'transparent',
+    color: '#6b7280',
+    border: '1px solid #e5e7eb',
+    padding: '5px 14px',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: '500',
     cursor: 'pointer',
-  }
+    transition: 'all 0.15s',
+  },
 }
 
 export default Navbar

@@ -43,6 +43,15 @@ public class PostController {
         return ResponseEntity.ok(postService.likePost(id, currentUser.getId()));
     }
 
+    // DELETE /api/posts/{id} – Post löschen (nur Autor)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePost(
+            @PathVariable String id,
+            @AuthenticationPrincipal User currentUser) {
+        postService.deletePost(id, currentUser.getId());
+        return ResponseEntity.noContent().build();
+    }
+
     // DELETE /api/posts/{id}/like – Like entfernen
     @DeleteMapping("/{id}/like")
     public ResponseEntity<PostResponse> unlikePost(

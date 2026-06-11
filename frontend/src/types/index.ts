@@ -32,6 +32,16 @@ export interface Comment {
   createdAt: string;
 }
 
+// Eine Antwort auf einen Kommentar
+export interface Reply {
+  id: string;
+  commentId: string;
+  content: string;
+  authorId: string;
+  authorUsername: string;
+  createdAt: string;
+}
+
 // Antwort vom Backend nach Login/Registrierung
 export interface AuthResponse {
   token: string;

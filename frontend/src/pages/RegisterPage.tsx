@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { registerUser } from '../api/auth'
 import { useAuth } from '../context/AuthContext'
 
-// Registrierungsseite – neuer Nutzer gibt Benutzername, E-Mail und Passwort ein
 function RegisterPage() {
   const navigate = useNavigate()
   const { login } = useAuth()
@@ -18,18 +17,15 @@ function RegisterPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-
     try {
-      // Registrieren und direkt einloggen
       const data = await registerUser(username, email, password)
       login(data.token, data.userId, data.username)
-      navigate('/') // Zum Feed weiterleiten
+      navigate('/')
     } catch (err: unknown) {
-      // Fehlermeldung vom Backend anzeigen wenn vorhanden
       if (err instanceof Error) {
-        setError(err.message || 'Registrierung fehlgeschlagen. Bitte erneut versuchen.')
+        setError(err.message || 'Registrierung fehlgeschlagen.')
       } else {
-        setError('Registrierung fehlgeschlagen. Bitte erneut versuchen.')
+        setError('Registrierung fehlgeschlagen.')
       }
     } finally {
       setLoading(false)
@@ -39,14 +35,25 @@ function RegisterPage() {
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h1 style={styles.title}>DualNet</h1>
-        <h2 style={styles.subtitle}>Konto erstellen</h2>
+        <div style={styles.brand}>
+          <span style={styles.brandDot} />
+          <span style={styles.brandName}>DualNet</span>
+        </div>
+        <h1 style={styles.title}>Konto erstellen</h1>
+        <p style={styles.subtitle}>Erstell dir ein Konto und werde Teil der Community.</p>
 
-        {error && <p style={styles.error}>{error}</p>}
+        {error && (
+          <div style={styles.error}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.field}>
-            <label>Benutzername (3–20 Zeichen)</label>
+            <label style={styles.label}>Benutzername <span style={styles.hint}>(3–20 Zeichen)</span></label>
             <input
               type="text"
               value={username}
@@ -55,22 +62,24 @@ function RegisterPage() {
               maxLength={20}
               required
               style={styles.input}
+              placeholder="dein_name"
             />
           </div>
 
           <div style={styles.field}>
-            <label>E-Mail</label>
+            <label style={styles.label}>E-Mail</label>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
               style={styles.input}
+              placeholder="du@beispiel.de"
             />
           </div>
 
           <div style={styles.field}>
-            <label>Passwort (min. 6 Zeichen)</label>
+            <label style={styles.label}>Passwort <span style={styles.hint}>(min. 6 Zeichen)</span></label>
             <input
               type="password"
               value={password}
@@ -78,6 +87,7 @@ function RegisterPage() {
               minLength={6}
               required
               style={styles.input}
+              placeholder="••••••••"
             />
           </div>
 
@@ -87,7 +97,8 @@ function RegisterPage() {
         </form>
 
         <p style={styles.switchText}>
-          Bereits ein Konto? <Link to="/login">Einloggen</Link>
+          Bereits ein Konto?{' '}
+          <Link to="/login" style={styles.switchLink}>Einloggen</Link>
         </p>
       </div>
     </div>
@@ -100,40 +111,114 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f0f2f5',
+    backgroundColor: '#f5f4f0',
+    padding: '24px 16px',
   },
   card: {
     backgroundColor: 'white',
-    padding: '40px',
-    borderRadius: '12px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+    padding: '40px 36px',
+    borderRadius: '14px',
+    border: '1px solid #e5e7eb',
+    boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
     width: '100%',
     maxWidth: '400px',
   },
-  title: { color: '#e94560', margin: '0 0 4px 0', textAlign: 'center' },
-  subtitle: { color: '#333', margin: '0 0 24px 0', textAlign: 'center', fontWeight: 'normal' },
-  error: {
-    backgroundColor: '#ffebee',
-    color: '#c62828',
-    padding: '10px',
-    borderRadius: '6px',
-    marginBottom: '16px',
-    fontSize: '14px',
+  brand: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginBottom: '24px',
   },
-  field: { display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' },
-  input: { padding: '10px', border: '1px solid #ccc', borderRadius: '6px', fontSize: '16px' },
+  brandDot: {
+    width: '8px',
+    height: '8px',
+    borderRadius: '50%',
+    backgroundColor: '#d64045',
+    display: 'block',
+  } as React.CSSProperties,
+  brandName: {
+    fontSize: '18px',
+    fontWeight: '700',
+    color: '#d64045',
+    letterSpacing: '-0.3px',
+  },
+  title: {
+    fontSize: '22px',
+    fontWeight: '700',
+    color: '#111827',
+    letterSpacing: '-0.4px',
+    marginBottom: '6px',
+  },
+  subtitle: {
+    fontSize: '14px',
+    color: '#9ca3af',
+    marginBottom: '28px',
+  },
+  error: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    backgroundColor: '#fdf0f0',
+    color: '#b91c1c',
+    padding: '10px 14px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+    fontSize: '13px',
+    border: '1px solid #fecaca',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+  },
+  field: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+  },
+  label: {
+    fontSize: '13px',
+    fontWeight: '500',
+    color: '#374151',
+  },
+  hint: {
+    color: '#9ca3af',
+    fontWeight: '400',
+  },
+  input: {
+    padding: '10px 14px',
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px',
+    fontSize: '15px',
+    color: '#111827',
+    backgroundColor: '#fafafa',
+    outline: 'none',
+    transition: 'border-color 0.15s',
+  },
   button: {
     width: '100%',
-    padding: '12px',
-    backgroundColor: '#e94560',
+    padding: '11px',
+    backgroundColor: '#d64045',
     color: 'white',
     border: 'none',
-    borderRadius: '6px',
-    fontSize: '16px',
+    borderRadius: '8px',
+    fontSize: '15px',
+    fontWeight: '600',
     cursor: 'pointer',
-    marginTop: '8px',
+    marginTop: '4px',
+    transition: 'background 0.15s',
   },
-  switchText: { textAlign: 'center', marginTop: '20px', color: '#666', fontSize: '14px' }
+  switchText: {
+    textAlign: 'center',
+    marginTop: '20px',
+    color: '#9ca3af',
+    fontSize: '14px',
+  },
+  switchLink: {
+    color: '#d64045',
+    fontWeight: '500',
+    textDecoration: 'none',
+  },
 }
 
 export default RegisterPage

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import App from './App'
+import './index.css'
 
 // Einstiegspunkt der React-Anwendung
 // Hängt die App in das <div id="root"> in der index.html ein

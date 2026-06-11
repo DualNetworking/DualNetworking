@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createPost } from '../api/posts'
 
-// Seite zum Erstellen eines neuen Posts
 function CreatePostPage() {
   const navigate = useNavigate()
   const [content, setContent] = useState('')
@@ -13,12 +12,9 @@ function CreatePostPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!content.trim()) return
-
     setLoading(true)
     setError('')
-
     try {
-      // Post erstellen und danach zum Feed weiterleiten
       await createPost(content.trim(), imageUrl.trim() || undefined)
       navigate('/')
     } catch {
@@ -28,19 +24,26 @@ function CreatePostPage() {
     }
   }
 
-  // Zeigt an wie viele der 500 Zeichen noch verbleiben
-  const remainingChars = 500 - content.length
+  const remaining = 500 - content.length
+  const isNearLimit = remaining < 50
 
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h2 style={styles.heading}>Neuen Post erstellen</h2>
+        <h1 style={styles.heading}>Neuen Beitrag erstellen</h1>
 
-        {error && <p style={styles.error}>{error}</p>}
+        {error && (
+          <div style={styles.error}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.field}>
-            <label>Dein Beitrag</label>
+            <label style={styles.label}>Dein Beitrag</label>
             <textarea
               value={content}
               onChange={e => setContent(e.target.value)}
@@ -50,14 +53,15 @@ function CreatePostPage() {
               required
               style={styles.textarea}
             />
-            {/* Zeichenzähler – wird rot wenn weniger als 50 Zeichen verbleiben */}
-            <span style={{ ...styles.counter, color: remainingChars < 50 ? '#c62828' : '#888' }}>
-              {remainingChars} Zeichen verbleibend
+            <span style={{ ...styles.counter, color: isNearLimit ? '#b91c1c' : '#9ca3af' }}>
+              {remaining} Zeichen verbleibend
             </span>
           </div>
 
           <div style={styles.field}>
-            <label>Bild-URL (optional)</label>
+            <label style={styles.label}>
+              Bild-URL <span style={styles.optional}>(optional)</span>
+            </label>
             <input
               type="url"
               value={imageUrl}
@@ -67,20 +71,18 @@ function CreatePostPage() {
             />
           </div>
 
-          <div style={styles.buttons}>
-            {/* Abbrechen – zurück zum Feed */}
+          <div style={styles.actions}>
             <button
               type="button"
               onClick={() => navigate('/')}
-              style={styles.cancelButton}
+              style={styles.cancelBtn}
             >
               Abbrechen
             </button>
-
             <button
               type="submit"
               disabled={loading || !content.trim()}
-              style={styles.submitButton}
+              style={styles.submitBtn}
             >
               {loading ? 'Wird veröffentlicht...' : 'Veröffentlichen'}
             </button>
@@ -93,70 +95,107 @@ function CreatePostPage() {
 
 const styles: Record<string, React.CSSProperties> = {
   page: {
-    maxWidth: '680px',
+    maxWidth: '640px',
     margin: '0 auto',
-    padding: '24px 16px',
+    padding: '28px 16px',
   },
   card: {
     backgroundColor: 'white',
     padding: '32px',
     borderRadius: '12px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+    border: '1px solid #e5e7eb',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
   },
-  heading: { color: '#1a1a2e', marginBottom: '24px' },
+  heading: {
+    fontSize: '20px',
+    fontWeight: '700',
+    color: '#111827',
+    letterSpacing: '-0.3px',
+    marginBottom: '24px',
+  },
   error: {
-    backgroundColor: '#ffebee',
-    color: '#c62828',
-    padding: '10px',
-    borderRadius: '6px',
-    marginBottom: '16px',
-    fontSize: '14px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    backgroundColor: '#fdf0f0',
+    color: '#b91c1c',
+    padding: '10px 14px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+    fontSize: '13px',
+    border: '1px solid #fecaca',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
   },
   field: {
     display: 'flex',
     flexDirection: 'column',
     gap: '6px',
-    marginBottom: '20px',
+  },
+  label: {
+    fontSize: '13px',
+    fontWeight: '500',
+    color: '#374151',
+  },
+  optional: {
+    color: '#9ca3af',
+    fontWeight: '400',
   },
   textarea: {
-    padding: '12px',
-    border: '1px solid #ccc',
-    borderRadius: '6px',
-    fontSize: '16px',
+    padding: '12px 14px',
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px',
+    fontSize: '15px',
     resize: 'vertical',
     fontFamily: 'inherit',
+    color: '#111827',
+    backgroundColor: '#fafafa',
+    outline: 'none',
+    lineHeight: '1.6',
   },
-  counter: { fontSize: '13px', alignSelf: 'flex-end' },
+  counter: {
+    fontSize: '12px',
+    alignSelf: 'flex-end',
+    fontWeight: '500',
+  },
   input: {
-    padding: '10px',
-    border: '1px solid #ccc',
-    borderRadius: '6px',
-    fontSize: '16px',
+    padding: '10px 14px',
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px',
+    fontSize: '15px',
+    color: '#111827',
+    backgroundColor: '#fafafa',
+    outline: 'none',
   },
-  buttons: {
+  actions: {
     display: 'flex',
-    gap: '12px',
+    gap: '10px',
     justifyContent: 'flex-end',
+    paddingTop: '4px',
   },
-  cancelButton: {
-    padding: '10px 20px',
+  cancelBtn: {
+    padding: '9px 20px',
     backgroundColor: 'white',
-    color: '#333',
-    border: '1px solid #ccc',
-    borderRadius: '6px',
+    color: '#374151',
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px',
     cursor: 'pointer',
-    fontSize: '16px',
+    fontSize: '14px',
+    fontWeight: '500',
   },
-  submitButton: {
-    padding: '10px 24px',
-    backgroundColor: '#e94560',
+  submitBtn: {
+    padding: '9px 24px',
+    backgroundColor: '#d64045',
     color: 'white',
     border: 'none',
-    borderRadius: '6px',
+    borderRadius: '8px',
     cursor: 'pointer',
-    fontSize: '16px',
-    fontWeight: 'bold',
-  }
+    fontSize: '14px',
+    fontWeight: '600',
+  },
 }
 
 export default CreatePostPage
