@@ -233,21 +233,69 @@ Qualität
 
 ### Qualitätsszenarien
 
-| ID | Szenario | Messgröße |
-|----|----------|-----------|
-| S1 | Nutzer gibt Passwort ein → wird mit BCrypt gehasht | Hash in DB, Klartext nie gespeichert |
-| S2 | Nicht-eingeloggter Nutzer ruft POST /api/posts auf | HTTP 401 zurück |
-| W1 | Entwickler fügt neuen Endpunkt hinzu | Nur Controller + Service + Repository betroffen |
-| B1 | Nutzer öffnet Feed mit 50 Posts | Ladezeit < 2 Sekunden |
+Vollständige Szenarien nach arc42-Format:
+
+| ID | Qualitätsziel | Stimulus | Quelle | Umgebung | Artefakt | Reaktion | Messgröße |
+|----|--------------|----------|--------|----------|----------|----------|-----------|
+| QS-01 | Sicherheit | Nutzer gibt Passwort ein | Nutzer (Browser) | Normalbetrieb | `AuthService.register()` | Passwort wird mit BCrypt gehasht, Klartext nie gespeichert | Hash in MongoDB, kein Klartext in Logs oder DB |
+| QS-02 | Sicherheit | Nicht-authentifizierter HTTP-Request auf geschützten Endpunkt (z.B. POST /api/posts) | Externer Aufrufer ohne JWT | Normalbetrieb | `JwtFilter` + Spring Security | HTTP 401 Unauthorized, kein Datenzugriff | Response-Code = 401 in < 50 ms |
+| QS-03 | Sicherheit | HTTP-Request mit abgelaufenem oder manipuliertem JWT-Token | Externer Aufrufer | Normalbetrieb | `JwtUtil.isTokenValid()` + `JwtFilter` | HTTP 401 Unauthorized, Token wird abgelehnt | Response-Code = 401, keine Daten im Response-Body |
+| QS-04 | Wartbarkeit | Entwickler fügt neuen REST-Endpunkt hinzu (z.B. Repost-Funktion) | Entwickler | Entwicklungsphase | Backend-Schichtenarchitektur | Nur Controller, Service und Repository für den neuen Endpunkt werden angelegt/geändert – kein anderer Code wird berührt | Anzahl betroffener Dateien außerhalb der neuen Schicht: 0 |
+| QS-05 | Performance | Nutzer öffnet Feed (GET /api/posts) mit 50 vorhandenen Posts | Nutzer (Browser) | Normalbetrieb, lokale Entwicklungsumgebung | `PostController` → `PostService` → MongoDB | Alle Posts werden geladen und als JSON zurückgegeben | Antwortzeit < 2 Sekunden end-to-end im Browser |
+| QS-06 | Zuverlässigkeit | Normaler Dauerbetrieb der App über mehrere Stunden | Mehrere gleichzeitige Nutzer | Normalbetrieb | Gesamtsystem (Frontend, Backend, MongoDB) | Keine unerwarteten Abstürze, keine Datenverluste | 0 unkontrollierte Prozessabbrüche, keine 5xx-Fehler ohne Ursache |
 
 ---
 
 ## Kapitel 11 – Risiken und technische Schulden
 
-*(Wird in einem späteren Aufgabenblatt ausgefüllt)*
+### 11.1 Identifizierte technische Schulden
+
+| ID | Komponente | Befund | Schwere | Mitigation |
+|----|-----------|--------|---------|------------|
+| TS-01 | `PostService.toResponseWithAuthor()` | N+1-Problem: Für jeden Post wird einzeln `userRepository.findById()` aufgerufen. Bei großem Feed entstehen viele Einzelabfragen gegen MongoDB. | Mittel | Batch-Abfrage mit `userRepository.findAllById(authorIds)` implementieren; akzeptabel für MVP-Größe |
+| TS-02 | `SecurityConfig.corsConfigurationSource()` | `allowedOrigins` enthält nur `localhost:5173`. Bei Deployment auf einem echten Server fehlt die Produktions-URL → CORS-Fehler. | Mittel | Origin als Umgebungsvariable auslagern (z.B. `CORS_ALLOWED_ORIGIN`); bei Deployment adressieren |
+| TS-03 | `JwtUtil.getSigningKey()` | `secret.getBytes()` ohne Charset-Angabe – nutzt System-Default. Auf Systemen mit abweichendem Default-Charset könnte der Schlüssel differieren. | Niedrig | Explizit `StandardCharsets.UTF_8` verwenden |
+| TS-04 | `PostController.createPost()` | Gibt HTTP 200 zurück statt REST-konformem HTTP 201 (Created). | Niedrig | `ResponseEntity.status(HttpStatus.CREATED).body(...)` verwenden |
+| TS-05 | SRS / Datenmodell | Kein Pagination-Mechanismus: Alle Posts werden ungefiltert geladen. Bei wachsender Datenmenge skaliert dies nicht. | Mittel | Cursor-basiertes oder Offset-Pagination für `/api/posts` implementieren (Post-MVP) |
+
+### 11.2 Identifizierte Projektrisiken
+
+| ID | Risiko | Wahrscheinlichkeit | Auswirkung | Gegenmaßnahme |
+|----|--------|-------------------|------------|----------------|
+| PR-01 | JWT-Secret in `application.properties` im Repository | Mittel | Hoch | Secret über Umgebungsvariable (`JWT_SECRET`) einlesen, nicht hardcoded einchecken |
+| PR-02 | MongoDB ohne Backup-Strategie | Niedrig | Hoch | Docker Volume für Datenpersistenz vorhanden; für Produktion: regelmäßige Dumps via `mongodump` |
+| PR-03 | Eingeschränkte Testabdeckung der Frontend-Komponenten | Mittel | Mittel | Kritische Komponenten (PostCard, LoginPage, CommentSection) mit Vitest abgedeckt; Ausbau geplant |
+| PR-04 | Abhängigkeit von externen MongoDB-Docker-Image-Updates | Niedrig | Niedrig | Image-Version in `docker-compose.yml` fixiert (`mongo:7`) |
+| PR-05 | Kein Rate-Limiting auf Auth-Endpunkten | Mittel | Mittel | Brute-Force-Schutz durch Spring Security; für Produktion: Rate-Limiter (z.B. Bucket4j) ergänzen |
 
 ---
 
 ## Kapitel 12 – Glossar
 
-*(Wird in einem späteren Aufgabenblatt ausgefüllt)*
+| Begriff | Bedeutung |
+|---------|-----------|
+| **Nutzer** | Registrierter Benutzer der DualNet-Plattform mit Konto, Profil und eigenem Feed |
+| **Post** | Textbeitrag eines Nutzers (max. 500 Zeichen), optional mit Bild-URL; zentrale Dateneinheit |
+| **Feed** | Chronologische Übersicht von Posts; in drei Varianten: Alle / Gefolgte / Eigene |
+| **Kommentar** | Textantwort eines Nutzers auf einen Post |
+| **Reply** | Verschachtelte Antwort auf einen Kommentar (eine Ebene Tiefe) |
+| **JWT** | JSON Web Token – kompakter, URL-sicherer Token zur Authentifizierung; enthält Subject (User-ID), Ausstellungszeitpunkt und Ablaufzeit; wird im `Authorization: Bearer`-Header übertragen |
+| **BCrypt** | Kryptographische Hashfunktion für Passwörter; mit Salt und Kostenfaktor; verhindert Rainbow-Table-Angriffe; verwendet in `AuthService` via Spring Security `PasswordEncoder` |
+| **SPA** | Single Page Application – Web-App die komplett im Browser läuft; Seitenwechsel ohne Server-Reload; das React-Frontend ist eine SPA |
+| **REST** | Representational State Transfer – Architekturstil für HTTP-APIs; zustandslos, ressourcenbasiert; das DualNet-Backend implementiert eine RESTful API |
+| **CORS** | Cross-Origin Resource Sharing – Browser-Sicherheitsmechanismus; erlaubt oder blockiert HTTP-Anfragen von einer anderen Domain; konfiguriert in `SecurityConfig` |
+| **DTO** | Data Transfer Object – einfaches Datenobjekt zum Transport zwischen Schichten; trennt interne Datenmodelle von der API-Schnittstelle (z.B. `PostResponse`, `UserProfileResponse`) |
+| **Controller** | Spring-Komponente (`@RestController`), die HTTP-Anfragen entgegennimmt und delegiert; enthält keine Geschäftslogik |
+| **Service** | Spring-Komponente (`@Service`), die Geschäftslogik enthält; orchestriert Repository-Aufrufe und Mapper |
+| **Repository** | Spring-Komponente (`@Repository` / `MongoRepository`), die Datenbankzugriffe kapselt; direkte Schnittstelle zu MongoDB |
+| **Mapper** | Hilfsklasse zur Konvertierung zwischen Entity und DTO (z.B. `PostMapper`, `UserMapper`) |
+| **MongoDB Collection** | Äquivalent zu einer relationalen Datenbanktabelle in MongoDB; DualNet nutzt: `users`, `posts`, `comments`, `replies` |
+| **Docker Compose** | Werkzeug zum Definieren und Starten von Multi-Container-Anwendungen; hier für MongoDB-Instanz verwendet |
+| **GitHub Actions** | CI/CD-Plattform von GitHub; führt bei jedem Push automatisch Build- und Test-Workflows aus |
+| **Vite** | Moderner Frontend-Build-Server und Bundler; ersetzt Webpack; unterstützt Hot Module Replacement für schnelle Entwicklung |
+| **Vitest** | Test-Framework für Vite-Projekte; API-kompatibel mit Jest; wird für Frontend-Unit-Tests verwendet |
+| **MockMvc** | Spring-Test-Werkzeug zum Testen von REST-Controllern ohne echten HTTP-Server |
+| **PMD** | Statisches Code-Analyse-Werkzeug; misst u.a. zyklomatische Komplexität; in Maven-Build integriert |
+| **ADR** | Architecture Decision Record – kurzes Dokument, das eine wichtige Architekturentscheidung mit Kontext und Begründung festhält |
+| **arc42** | Standardisiertes Template zur Dokumentation von Software-Architekturen; strukturiert in 12 Kapitel |
+| **RMMM** | Risk Mitigation, Monitoring and Management – strukturierte Risikoverwaltung mit Eintrittswahrscheinlichkeit, Auswirkung und Gegenmaßnahmen |

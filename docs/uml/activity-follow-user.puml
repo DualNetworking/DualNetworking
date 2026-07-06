@@ -1,0 +1,27 @@
+@startuml activity-follow-user
+title Aktivitätsdiagramm: UC-05 Nutzer folgen / entfolgen
+
+|Nutzer (Browser)|
+start
+:Nutzerprofil öffnen;
+:Folgen / Entfolgen klicken;
+
+|System (Backend)|
+:JWT-Token prüfen;
+if (Eigenes Profil?) then (Ja)
+  :400 Bad Request zurückgeben; <<#f8cecc>>
+  stop
+else (Nein)
+endif
+:Follower-Liste in MongoDB\naktualisieren;
+:200 OK zurückgeben;
+
+|Nutzer (Browser)|
+if (Bereits gefolgt?) then (Nein – jetzt folgen)
+  :Follower-Zahl +1 anzeigen; <<#d5e8d4>>
+else (Ja – jetzt entfolgen)
+  :Follower-Zahl -1 anzeigen; <<#f8cecc>>
+endif
+stop
+
+@enduml

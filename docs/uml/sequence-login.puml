@@ -1,0 +1,40 @@
+@startuml sequence-login
+title Sequenzdiagramm: UC-02 Login
+
+skinparam sequenceMessageAlign center
+skinparam participant {
+  BackgroundColor<<frontend>> #dae8fc
+  BorderColor<<frontend>> #6c8ebf
+  BackgroundColor<<backend>> #d5e8d4
+  BorderColor<<backend>> #82b366
+  BackgroundColor<<db>> #ffe6cc
+  BorderColor<<db>> #d6b656
+}
+
+actor "Nutzer" as user
+participant "LoginPage\n(React)" as loginPage <<frontend>>
+participant "AuthController\n(Spring)" as authCtrl <<backend>>
+participant "AuthService\n(Spring)" as authSvc <<backend>>
+database "MongoDB\n(Datenbank)" as db <<db>>
+
+user -> loginPage : 1: E-Mail + Passwort eingeben
+loginPage -> authCtrl : 2: POST /api/auth/login\n{ email, password }
+authCtrl -> authSvc : 3: authService.login(request)
+authSvc -> db : 4: findByEmail(email)
+db --> authSvc : 5: User (oder null)
+
+note right of authSvc
+  6: passwordEncoder.matches()\n[interner Aufruf]
+  7: jwtUtil.generateToken(userId)\n[interner Aufruf]
+end note
+
+alt Passwort korrekt
+  authSvc --> authCtrl : 8: AuthResponse { token, userId, username }
+  authCtrl --> loginPage : 9: HTTP 200 OK { token, userId, username }
+  loginPage --> user : 10: Token in localStorage speichern,\nzum Feed weiterleiten
+else Passwort falsch
+  authCtrl --> loginPage : HTTP 401 Unauthorized
+  loginPage --> user : Fehlermeldung anzeigen
+end
+
+@enduml

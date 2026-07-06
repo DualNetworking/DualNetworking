@@ -144,15 +144,48 @@ DualNetworking/
 
 ---
 
-## Dokumentation
+## Dokumentations-Index
+
+### Anforderungen & Architektur
 
 | Dokument | Pfad |
 |----------|------|
 | Software Requirements Specification (SRS) | [docs/SoftwareRequirementsSpecification.md](docs/SoftwareRequirementsSpecification.md) |
 | arc42 Architekturdokumentation | [docs/arc42/arc42-architecture.md](docs/arc42/arc42-architecture.md) |
-| Architecture Decision Records | [docs/adr/](docs/adr/) |
-| UML Diagramme | [docs/uml/](docs/uml/) |
-| Wöchentliche Fortschrittsberichte | [docs/progress/](docs/progress/) |
+| Architecture Decision Records (4 Stück) | [docs/adr/](docs/adr/) |
+| UML Diagramme (draw.io + PNG) | [docs/uml/](docs/uml/) |
+
+### Qualität & Tests
+
+| Dokument | Pfad |
+|----------|------|
+| Testbericht (Testplan, Testfälle, Status) | [docs/Tests/Testplan.md](docs/Tests/Testplan.md) |
+| Refactoring-Zusammenfassung (Clean Code) | [docs/Refactoring-Zusammenfassung.md](docs/Refactoring-Zusammenfassung.md) |
+| Review-Protokoll | [docs/progress/Woche-17-Review.md](docs/progress/Woche-17-Review.md) |
+| Software-Metriken (CC, Kommentaranteil, SMI) | [docs/progress/Woche-17-Metriken.md](docs/progress/Woche-17-Metriken.md) |
+
+### Projektmanagement
+
+| Dokument | Pfad |
+|----------|------|
+| Wöchentliche Fortschrittsberichte (Woche 1–17) | [docs/progress/](docs/progress/) |
+| RMMM-Liste (Risikomanagement) | [Risikomanagement/Risikomanagement.xlsx](Risikomanagement/Risikomanagement.xlsx) |
+| Projekt-Retrospektive (Screenshot) | [docs/Retroperspektive/RetroDiscussion.png](docs/Retroperspektive/RetroDiscussion.png) |
+
+### Abschlusspräsentation
+
+| Dokument | Pfad |
+|----------|------|
+| Präsentations-Handout | [docs/Abschlusspräsentation/Handout.md](docs/Abschlusspr%C3%A4sentation/Handout.md) |
+| Präsentationsfolien (PPTX) | [docs/Abschlusspräsentation/DualNet-Abschlusspraesentation-v2.pptx](docs/Abschlusspr%C3%A4sentation/DualNet-Abschlusspraesentation-v2.pptx) |
+| Demo-Screenshots | [docs/screenshots/](docs/screenshots/) |
+
+### Externe Links
+
+| Ressource | Link |
+|-----------|------|
+| GitHub Repository | https://github.com/DualNetworking/DualNetworking |
+| Scrum-Board | ⚠️ TODO: Link eintragen |
 
 ---
 

@@ -1,0 +1,24 @@
+@startuml activity-create-post
+title Aktivitätsdiagramm: UC-03 Post erstellen
+
+|Nutzer (Browser)|
+start
+if (Eingeloggt?) then (Nein)
+  :Zur Login-Seite weiterleiten; <<#f8cecc>>
+  stop
+else (Ja)
+endif
+:Post-Formular öffnen;
+:Text eingeben\n(max. 500 Zeichen);
+:"Veröffentlichen" klicken;
+
+|System (Backend)|
+:JWT-Token prüfen\n(JwtFilter);
+:Inhalt validieren\n(@Valid PostRequest);
+:Post in MongoDB speichern;
+
+|Nutzer (Browser)|
+:Zum Feed weiterleiten\n(Post sichtbar); <<#d5e8d4>>
+stop
+
+@enduml

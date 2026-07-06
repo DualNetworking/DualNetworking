@@ -1,0 +1,54 @@
+@startuml use-case-diagram
+title DualNet – Use-Case-Diagramm
+
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor<<public>> #dae8fc
+  BorderColor<<public>> #6c8ebf
+  BackgroundColor<<read>> #d5e8d4
+  BorderColor<<read>> #82b366
+  BackgroundColor<<auth>> #ffe6cc
+  BorderColor<<auth>> #d6b656
+}
+
+left to right direction
+
+actor "Besucher" as visitor
+actor "Nutzer\n(eingeloggt)" as user
+
+visitor -|> user
+
+rectangle "DualNet System" {
+  usecase "Registrieren" as UC_REG <<public>>
+  usecase "Einloggen" as UC_LOGIN <<public>>
+  usecase "Feed anzeigen" as UC_FEED <<read>>
+  usecase "Profil anzeigen" as UC_PROFILE <<read>>
+  usecase "Post erstellen" as UC_POST <<auth>>
+  usecase "Post liken" as UC_LIKE <<auth>>
+  usecase "Kommentar schreiben" as UC_COMMENT <<auth>>
+  usecase "Nutzer folgen /\nentfolgen" as UC_FOLLOW <<auth>>
+}
+
+visitor --> UC_REG
+visitor --> UC_LOGIN
+visitor --> UC_FEED
+visitor --> UC_PROFILE
+
+user --> UC_POST
+user --> UC_LIKE
+user --> UC_COMMENT
+user --> UC_FOLLOW
+
+UC_POST ..> UC_LOGIN : <<include>>
+UC_LIKE ..> UC_LOGIN : <<include>>
+UC_COMMENT ..> UC_LOGIN : <<include>>
+UC_FOLLOW ..> UC_LOGIN : <<include>>
+
+legend right
+  |= Farbe |= Bedeutung |
+  |<#dae8fc> Blau | Auth-Aktionen |
+  |<#d5e8d4> Grün | Öffentlich lesbar |
+  |<#ffe6cc> Orange | Login erforderlich |
+endlegend
+
+@enduml

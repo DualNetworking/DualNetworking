@@ -30,9 +30,28 @@ DualNet ist eine Web-Applikation, auf der Nutzer Beiträge veröffentlichen, and
 
 ### 2.1 Use-Case-Diagramm
 
-Siehe: [docs/uml/use-case-diagram.png](uml/use-case-diagram.png)
+![Use-Case-Diagramm](uml/use-case-diagram.png)
 
-### 2.2 User Stories
+*Exportiert aus: [uml/use-case-diagram.drawio](uml/use-case-diagram.drawio)*
+
+### 2.2 UI-Mockups
+
+> ⚠️ TODO: App starten (`./start.sh`) und Screenshots in `docs/screenshots/` ablegen.
+> Benötigt: `login.png`, `feed.png`, `create-post.png`, `profile.png`, `comments.png`
+
+Screenshots der laufenden Anwendung als Referenz für die Hauptfunktionen:
+
+| Screen | Datei |
+|--------|-------|
+| Login-Seite | ![Login](../docs/screenshots/login.png) |
+| Feed-Ansicht | ![Feed](../docs/screenshots/feed.png) |
+| Post erstellen | ![Post erstellen](../docs/screenshots/create-post.png) |
+| Profil-Ansicht | ![Profil](../docs/screenshots/profile.png) |
+| Kommentar-Bereich | ![Kommentare](../docs/screenshots/comments.png) |
+
+---
+
+### 2.3 User Stories
 
 | ID | Als ... | möchte ich ... | damit ... | Priorität |
 |----|---------|----------------|-----------|-----------|
@@ -51,7 +70,7 @@ Siehe: [docs/uml/use-case-diagram.png](uml/use-case-diagram.png)
 | US-13 | Nutzer | meine eigenen Beiträge löschen können | ich unerwünschte Posts entfernen kann | Mittel |
 | US-14 | Nutzer | meine eigenen Beiträge in einem separaten Tab sehen können | ich einen Überblick über meine Aktivität behalte | Niedrig |
 
-### 2.3 Use Cases (Detailbeschreibung)
+### 2.4 Use Cases (Detailbeschreibung)
 
 #### UC-01: Registrierung
 - **Akteur:** Besucher
@@ -64,8 +83,15 @@ Siehe: [docs/uml/use-case-diagram.png](uml/use-case-diagram.png)
   5. Nutzer wird zur Login-Seite weitergeleitet
 - **Nachbedingung:** Nutzer kann sich einloggen
 - **Fehlerfall:** E-Mail bereits vergeben → Fehlermeldung
+- **Geschätzter Aufwand:** Mittel
+- **Zugehörige User Stories:** US-01
+- **UI-Mockup:** Login-/Registrierungs-Seite (siehe Abschnitt 2.2)
 
-Aktivitätsdiagramm: [docs/uml/activity-register.png](uml/activity-register.png)
+**Aktivitätsdiagramm:**
+
+![Aktivitätsdiagramm Registrierung](uml/activity-register.png)
+
+*Exportiert aus: [uml/activity-register.drawio](uml/activity-register.drawio)*
 
 #### UC-02: Login
 - **Akteur:** Besucher mit Konto
@@ -75,8 +101,17 @@ Aktivitätsdiagramm: [docs/uml/activity-register.png](uml/activity-register.png)
   3. System gibt JWT-Token zurück
   4. Frontend speichert Token im localStorage
   5. Nutzer wird zum Feed weitergeleitet
+- **Nachbedingung:** JWT-Token im localStorage, Nutzer ist eingeloggt
+- **Fehlerfall:** Falsches Passwort → HTTP 401, Fehlermeldung im UI
+- **Geschätzter Aufwand:** Mittel
+- **Zugehörige User Stories:** US-02
+- **UI-Mockup:** Login-Seite (siehe Abschnitt 2.2)
 
-Sequenzdiagramm: [docs/uml/sequence-login.png](uml/sequence-login.png)
+**Sequenzdiagramm:**
+
+![Sequenzdiagramm Login](uml/sequence-login.png)
+
+*Exportiert aus: [uml/sequence-login.drawio](uml/sequence-login.drawio)*
 
 #### UC-03: Post erstellen
 - **Akteur:** Eingeloggter Nutzer
@@ -87,25 +122,56 @@ Sequenzdiagramm: [docs/uml/sequence-login.png](uml/sequence-login.png)
   4. Nutzer klickt "Veröffentlichen"
   5. Backend speichert Post in MongoDB
   6. Nutzer wird zum Feed weitergeleitet
+- **Nachbedingung:** Post ist in MongoDB gespeichert und im Feed sichtbar
+- **Fehlerfall:** Text leer oder JWT fehlt → HTTP 400/401
+- **Geschätzter Aufwand:** Mittel
+- **Zugehörige User Stories:** US-03
+- **UI-Mockup:** "Post erstellen"-Seite (siehe Abschnitt 2.2)
 
-Aktivitätsdiagramm: [docs/uml/activity-create-post.png](uml/activity-create-post.png)
-Sequenzdiagramm: [docs/uml/sequence-create-post.png](uml/sequence-create-post.png)
+**Aktivitätsdiagramm:**
+
+![Aktivitätsdiagramm Post erstellen](uml/activity-create-post.png)
+
+*Exportiert aus: [uml/activity-create-post.drawio](uml/activity-create-post.drawio)*
+
+**Sequenzdiagramm:**
+
+![Sequenzdiagramm Post erstellen](uml/sequence-create-post.png)
+
+*Exportiert aus: [uml/sequence-create-post.drawio](uml/sequence-create-post.drawio)*
 
 #### UC-04: Feed anzeigen
 - **Akteur:** Jeder (auch nicht eingeloggt)
+- **Vorbedingung:** keine
 - **Ablauf:**
   1. Nutzer öffnet Startseite
   2. Frontend lädt alle Posts vom Backend
   3. Posts werden chronologisch (neueste zuerst) angezeigt
+- **Nachbedingung:** Feed mit allen Posts sichtbar
+- **Fehlerfall:** Backend nicht erreichbar → Fehlermeldung im UI
+- **Geschätzter Aufwand:** Niedrig
+- **Zugehörige User Stories:** US-04, US-12, US-14
+- **UI-Mockup:** Feed-Ansicht (siehe Abschnitt 2.2)
 
 #### UC-05: Nutzer folgen/entfolgen
 - **Akteur:** Eingeloggter Nutzer
+- **Vorbedingung:** Nutzer ist eingeloggt, Zielprofil existiert
 - **Ablauf:**
   1. Nutzer öffnet Profil eines anderen Nutzers
   2. Nutzer klickt "Folgen" oder "Entfolgen"
-  3. Backend aktualisiert Follower-Listen
+  3. Backend aktualisiert Follower-Listen beider Nutzer in MongoDB
+  4. Button-Status wechselt im UI (Folgen ↔ Entfolgen)
+- **Nachbedingung:** Follower-Liste aktualisiert; Following-Feed zeigt Posts des gefolgten Nutzers
+- **Fehlerfall:** Nutzer versucht sich selbst zu folgen → HTTP 400
+- **Geschätzter Aufwand:** Mittel
+- **Zugehörige User Stories:** US-05, US-12
+- **UI-Mockup:** Profil-Ansicht mit Follow-Button (siehe Abschnitt 2.2)
 
-Aktivitätsdiagramm: [docs/uml/activity-follow-user.png](uml/activity-follow-user.png)
+**Aktivitätsdiagramm:**
+
+![Aktivitätsdiagramm Nutzer folgen](uml/activity-follow-user.png)
+
+*Exportiert aus: [uml/activity-follow-user.drawio](uml/activity-follow-user.drawio)*
 
 ---
 

@@ -1,0 +1,37 @@
+@startuml activity-register
+title Aktivitätsdiagramm: UC-01 Registrierung
+
+skinparam activity {
+  BackgroundColor #dae8fc
+  BorderColor #6c8ebf
+}
+
+|Nutzer (Browser)|
+start
+:Registrierungsseite öffnen;
+:Formular ausfüllen\n(Name, E-Mail, Passwort);
+:Formular absenden;
+
+|System (Backend)|
+:Eingaben validieren\n(Format prüfen);
+if (E-Mail/Name bereits vergeben?) then (Ja)
+  |Nutzer (Browser)|
+  :Fehlermeldung anzeigen; <<#f8cecc>>
+  :Formular erneut ausfüllen;
+  |System (Backend)|
+  :Eingaben validieren;
+  if (Immer noch vergeben?) then (Ja)
+    stop
+  else (Nein)
+  endif
+else (Nein)
+endif
+:Passwort hashen\n(BCrypt);
+:Nutzer in MongoDB speichern;
+:JWT-Token generieren\nund zurückgeben;
+
+|Nutzer (Browser)|
+:Zum Feed weiterleiten; <<#d5e8d4>>
+stop
+
+@enduml

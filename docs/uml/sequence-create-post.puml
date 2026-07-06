@@ -1,0 +1,40 @@
+@startuml sequence-create-post
+title Sequenzdiagramm: UC-03 Post erstellen
+
+skinparam sequenceMessageAlign center
+skinparam participant {
+  BackgroundColor<<frontend>> #dae8fc
+  BorderColor<<frontend>> #6c8ebf
+  BackgroundColor<<backend>> #d5e8d4
+  BorderColor<<backend>> #82b366
+  BackgroundColor<<db>> #ffe6cc
+  BorderColor<<db>> #d6b656
+}
+
+actor "Nutzer" as user
+participant "CreatePostPage\n(React)" as page <<frontend>>
+participant "JwtFilter\n(Spring)" as jwtFilter <<backend>>
+participant "PostController\n(Spring)" as postCtrl <<backend>>
+participant "PostService\n(Spring)" as postSvc <<backend>>
+database "MongoDB" as db <<db>>
+
+user -> page : 1: Text eingeben + Absenden
+page -> jwtFilter : 2: POST /api/posts\nAuthorization: Bearer <token>\n{ content, imageUrl }
+
+alt Kein gültiger Token
+  jwtFilter --> page : HTTP 401 Unauthorized
+  page --> user : Fehlermeldung
+else Token gültig
+  note right of jwtFilter
+    3: Token validieren\n+ User laden\n[interner Aufruf]
+  end note
+  jwtFilter -> postCtrl : 4: createPost(request, userId)
+  postCtrl -> postSvc : 5: postService.createPost(request, userId)
+  postSvc -> db : 6: postRepository.save(post)
+  db --> postSvc : 7: Post (mit ID, createdAt)
+  postSvc --> postCtrl : 8: PostResponse\n(mit authorUsername, likeCount)
+  postCtrl --> page : 9: HTTP 200 OK { post }
+  page --> user : 10: navigate('/') – Feed anzeigen
+end
+
+@enduml
