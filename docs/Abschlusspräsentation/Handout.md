@@ -2,7 +2,7 @@
 
 **Kurs:** TINF24B4 · DHBW Karlsruhe · 2025/2026
 **Team:** Max · Sebastiano · Ali · Johannes
-**Präsentationsdatum:** > ⚠️ TODO: Datum eintragen (z.B. 11.07.2026)
+**Präsentationsdatum:** > TODO: Datum eintragen (z.B. 11.07.2026)
 
 ---
 
@@ -22,12 +22,12 @@ Das Projekt entstand im Rahmen des Software-Engineering-Kurses an der DHBW Karls
 
 ## Statistiken
 
-> ⚠️ TODO: Stunden aus dem Scrum-Board eintragen.
+> TODO: Stunden aus dem Scrum-Board eintragen.
 > Commit-Verteilung ermitteln mit: `git shortlog -sn`
 
 ### Stunden je Person
 
-⚠️ TODO: Echte Stunden eintragen
+TODO: Echte Stunden eintragen
 
 | Person | Frontend | Backend | Doku | Tests | PM | **Gesamt** |
 |--------|----------|---------|------|-------|----|-----------|
@@ -39,7 +39,7 @@ Das Projekt entstand im Rahmen des Software-Engineering-Kurses an der DHBW Karls
 
 ### Stunden je Projektphase
 
-⚠️ TODO: Echte Stunden eintragen
+TODO: Echte Stunden eintragen
 
 | Phase | Stunden | Anteil |
 |-------|---------|--------|
@@ -128,7 +128,7 @@ Die App läuft lokal mit `./start.sh` (Docker + Backend + Frontend in einem Befe
 | Ressource | Link |
 |-----------|------|
 | GitHub Repository | https://github.com/DualNetworking/DualNetworking |
-| Scrum Board | ⚠️ TODO: Link eintragen |
+| Scrum Board | TODO: Link eintragen |
 | arc42 Dokumentation | `docs/arc42/arc42-architecture.md` |
 | SRS | `docs/SoftwareRequirementsSpecification.md` |
 | Testplan | `docs/Tests/Testplan.md` |

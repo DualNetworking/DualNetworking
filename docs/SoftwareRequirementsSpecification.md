@@ -36,7 +36,7 @@ DualNet ist eine Web-Applikation, auf der Nutzer Beiträge veröffentlichen, and
 
 ### 2.2 UI-Mockups
 
-> ⚠️ TODO: App starten (`./start.sh`) und Screenshots in `docs/screenshots/` ablegen.
+> TODO: App starten (`./start.sh`) und Screenshots in `docs/screenshots/` ablegen.
 > Benötigt: `login.png`, `feed.png`, `create-post.png`, `profile.png`, `comments.png`
 
 Screenshots der laufenden Anwendung als Referenz für die Hauptfunktionen:
