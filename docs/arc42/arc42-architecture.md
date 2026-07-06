@@ -168,7 +168,7 @@ Sequenzdiagramm: [../uml/sequence-create-post.png](../uml/sequence-create-post.p
 Entwickler-PC
 ├── Browser (localhost:5173) → Vite Dev Server → React App
 ├── Backend (localhost:8080) → Spring Boot JAR
-└── MongoDB (localhost:27017) → Docker Container
+└── MongoDB (localhost:27017) → Lokal installiert, verwaltet via MongoDB Compass
 ```
 
 ### CI/CD (GitHub Actions)
@@ -263,9 +263,9 @@ Vollständige Szenarien nach arc42-Format:
 | ID | Risiko | Wahrscheinlichkeit | Auswirkung | Gegenmaßnahme |
 |----|--------|-------------------|------------|----------------|
 | PR-01 | JWT-Secret in `application.properties` im Repository | Mittel | Hoch | Secret über Umgebungsvariable (`JWT_SECRET`) einlesen, nicht hardcoded einchecken |
-| PR-02 | MongoDB ohne Backup-Strategie | Niedrig | Hoch | Docker Volume für Datenpersistenz vorhanden; für Produktion: regelmäßige Dumps via `mongodump` |
+| PR-02 | MongoDB ohne Backup-Strategie | Niedrig | Hoch | Lokale MongoDB-Instanz; für Produktion: regelmäßige Dumps via `mongodump` empfohlen |
 | PR-03 | Eingeschränkte Testabdeckung der Frontend-Komponenten | Mittel | Mittel | Kritische Komponenten (PostCard, LoginPage, CommentSection) mit Vitest abgedeckt; Ausbau geplant |
-| PR-04 | Abhängigkeit von externen MongoDB-Docker-Image-Updates | Niedrig | Niedrig | Image-Version in `docker-compose.yml` fixiert (`mongo:7`) |
+| PR-04 | MongoDB-Version veraltet auf Entwickler-Maschinen | Niedrig | Niedrig | MongoDB 7+ empfohlen; Version über MongoDB Compass prüfbar |
 | PR-05 | Kein Rate-Limiting auf Auth-Endpunkten | Mittel | Mittel | Brute-Force-Schutz durch Spring Security; für Produktion: Rate-Limiter (z.B. Bucket4j) ergänzen |
 
 ---
@@ -290,7 +290,7 @@ Vollständige Szenarien nach arc42-Format:
 | **Repository** | Spring-Komponente (`@Repository` / `MongoRepository`), die Datenbankzugriffe kapselt; direkte Schnittstelle zu MongoDB |
 | **Mapper** | Hilfsklasse zur Konvertierung zwischen Entity und DTO (z.B. `PostMapper`, `UserMapper`) |
 | **MongoDB Collection** | Äquivalent zu einer relationalen Datenbanktabelle in MongoDB; DualNet nutzt: `users`, `posts`, `comments`, `replies` |
-| **Docker Compose** | Werkzeug zum Definieren und Starten von Multi-Container-Anwendungen; hier für MongoDB-Instanz verwendet |
+| **MongoDB Compass** | Grafisches Verwaltungswerkzeug für MongoDB; wird im Projekt zur lokalen Datenbankadministration verwendet (Collections anzeigen, Queries testen, Verbindung prüfen) |
 | **GitHub Actions** | CI/CD-Plattform von GitHub; führt bei jedem Push automatisch Build- und Test-Workflows aus |
 | **Vite** | Moderner Frontend-Build-Server und Bundler; ersetzt Webpack; unterstützt Hot Module Replacement für schnelle Entwicklung |
 | **Vitest** | Test-Framework für Vite-Projekte; API-kompatibel mit Jest; wird für Frontend-Unit-Tests verwendet |

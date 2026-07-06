@@ -53,7 +53,7 @@ TODO: Echte Stunden eintragen
 
 ## Demo-Highlights
 
-Die App läuft lokal mit `./start.sh` (Docker + Backend + Frontend in einem Befehl).
+Die App läuft lokal mit `./start.sh` (Backend + Frontend in einem Befehl). MongoDB läuft als lokaler Service (via MongoDB Compass).
 
 | Schritt | Aktion | Ergebnis |
 |---------|--------|----------|
@@ -83,7 +83,7 @@ Die App läuft lokal mit `./start.sh` (Docker + Backend + Frontend in einem Befe
 │                                │           │
 │                       ┌────────▼────────┐  │
 │                       │    MongoDB 7    │  │
-│                       │  (Docker)       │  │
+│                       │  (lokal)        │  │
 │                       └─────────────────┘  │
 └─────────────────────────────────────────────┘
 ```
@@ -97,7 +97,7 @@ Die App läuft lokal mit `./start.sh` (Docker + Backend + Frontend in einem Befe
 | # | Bereich | Highlight |
 |---|---------|-----------|
 | 1 | **Architektur** | arc42-Dokumentation (12 Kapitel), 4 Architecture Decision Records (ADRs) |
-| 2 | **Tools** | GitHub Actions CI/CD, Docker Compose, Maven PMD, Vitest, JUnit 5 |
+| 2 | **Tools** | GitHub Actions CI/CD, MongoDB Compass, Maven PMD, Vitest, JUnit 5 |
 | 3 | **Datenbankdesign** | 4 MongoDB Collections (users, posts, comments, replies), dokumentenbasiert ohne ORM |
 | 4 | **Tests** | 47 Testfälle in 5 Kategorien (Unit BE, Unit FE, Integration, Smoke, Security) – alle Unit/IT-Tests bestanden |
 | 5 | **Metriken** | PMD Cyclomatic Complexity via Maven, 6 Code Smells identifiziert & refaktorisiert |
@@ -115,7 +115,7 @@ Die App läuft lokal mit `./start.sh` (Docker + Backend + Frontend in einem Befe
 | Backend | Java + Spring Boot | 21 / 3.3.4 |
 | Auth | JWT (JJWT) | 0.12.6 |
 | Datenbank | MongoDB | 7 |
-| Infrastruktur | Docker Compose | – |
+| Infrastruktur | MongoDB Compass (lokal) | – |
 | CI/CD | GitHub Actions | – |
 | FE-Tests | Vitest + React Testing Library | 1.6 / 16.0 |
 | BE-Tests | JUnit 5 + Mockito + MockMvc | (Spring Boot Test) |

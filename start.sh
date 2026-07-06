@@ -38,8 +38,6 @@ check_command() {
 # -------------------------------------------------------
 echo -e "${YELLOW}🔍 Voraussetzungen prüfen...${NC}"
 
-check_command "docker"
-check_command "docker-compose"
 check_command "mvn"
 check_command "node"
 check_command "npm"
@@ -185,8 +183,8 @@ cleanup() {
         echo -e "${GREEN}✅ Frontend gestoppt.${NC}"
     fi
 
-    # MongoDB läuft weiter (mit docker-compose stop beenden falls gewünscht)
-    echo -e "${YELLOW}💡 MongoDB läuft noch. Zum Stoppen: docker-compose stop${NC}"
+    # MongoDB läuft weiter (lokal installiert, via MongoDB Compass verwaltbar)
+    echo -e "${YELLOW}💡 MongoDB läuft lokal weiter (localhost:27017).${NC}"
     echo ""
 
     # PID-Dateien löschen

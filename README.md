@@ -13,21 +13,19 @@ Eine Social-Media-Plattform als Hochschulprojekt (TINF24B4, DHBW Karlsruhe).
 ```
 
 Das Script startet automatisch:
-1. MongoDB (via Docker)
-2. Spring Boot Backend (Port 8080)
-3. React Frontend (Port 5173)
-4. Öffnet den Browser auf http://localhost:5173
+1. Spring Boot Backend (Port 8080)
+2. React Frontend (Port 5173)
+3. Öffnet den Browser auf http://localhost:5173
 
-> **Voraussetzungen:** Docker, Java 21, Maven, Node.js 20+
+> **Voraussetzung:** MongoDB läuft lokal auf Port 27017 (z.B. via MongoDB Compass gestartet), Java 21, Maven, Node.js 20+
 
 ---
 
 ## Manueller Start (Schritt für Schritt)
 
 ### 1. MongoDB starten
-```bash
-docker-compose up -d
-```
+MongoDB lokal starten (z.B. über MongoDB Compass oder als lokalen Service).
+Sicherstellen dass MongoDB auf `localhost:27017` erreichbar ist.
 
 ### 2. Backend starten
 ```bash
@@ -47,9 +45,7 @@ Frontend läuft auf: **http://localhost:5173**
 ### Alles stoppen
 ```bash
 # Backend + Frontend: Strg+C in den jeweiligen Terminals
-
-# MongoDB stoppen:
-docker-compose stop
+# MongoDB: läuft als lokaler Service weiter
 ```
 
 ---
@@ -62,6 +58,7 @@ docker-compose stop
 | Build | Vite | 5 |
 | Backend | Java + Spring Boot | Java 21, Spring 3.3 |
 | Datenbank | MongoDB | 7 |
+| DB-Tool | MongoDB Compass | – |
 | CI/CD | GitHub Actions | – |
 
 ---
@@ -71,7 +68,7 @@ docker-compose stop
 ```
 DualNetworking/
 ├── start.sh                 ← Alles auf einmal starten
-├── docker-compose.yml       ← MongoDB starten
+├── docker-compose.yml       ← (veraltet, nicht mehr in Verwendung)
 │
 ├── docs/                    ← Alle Dokumente
 │   ├── SoftwareRequirementsSpecification.md
@@ -193,7 +190,8 @@ DualNetworking/
 
 | Tool | Version | Download |
 |------|---------|----------|
-| Docker Desktop | Aktuell | https://www.docker.com/products/docker-desktop |
+| MongoDB (lokal) | 7+ | https://www.mongodb.com/try/download/community |
+| MongoDB Compass | Aktuell | https://www.mongodb.com/try/download/compass |
 | Java JDK | 21+ | https://adoptium.net/ |
 | Apache Maven | 3.9+ | https://maven.apache.org/download.cgi |
 | Node.js | 20+ | https://nodejs.org/ |
@@ -204,7 +202,7 @@ DualNetworking/
 
 | Fehler | Ursache | Lösung |
 |--------|---------|--------|
-| `Connection refused (27017)` | MongoDB läuft nicht | `docker-compose up -d` |
+| `Connection refused (27017)` | MongoDB läuft nicht | MongoDB Compass starten oder `mongod` lokal starten |
 | `Port 8080 already in use` | Anderer Prozess belegt Port | `lsof -i :8080` dann `kill <PID>` |
 | `Port 5173 already in use` | Anderer Prozess belegt Port | `lsof -i :5173` dann `kill <PID>` |
 | Weiße Seite im Browser | Frontend-Build-Fehler | `cat frontend.log` prüfen |
