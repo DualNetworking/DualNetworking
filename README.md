@@ -182,7 +182,7 @@ DualNetworking/
 | Ressource | Link |
 |-----------|------|
 | GitHub Repository | https://github.com/DualNetworking/DualNetworking |
-| Scrum-Board | TODO: Link eintragen |
+| Scrum-Board | TODO: https://github.com/MaximusMitSchuss/DualNet/discussions |
 
 ---
 
